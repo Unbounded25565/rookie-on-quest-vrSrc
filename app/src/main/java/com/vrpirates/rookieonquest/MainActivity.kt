@@ -917,15 +917,15 @@ fun CustomTopBar(
                         imageVector = Icons.Default.Menu,
                         contentDescription = "Menu",
                         tint = Color.White,
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
                 Text(
                     text = "ROOKIE ON QUEST",
-                    style = MaterialTheme.typography.titleLarge.copy(
+                    style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Black,
-                        letterSpacing = 2.sp
+                        letterSpacing = 1.sp
                     ),
                     color = Color.White,
                     modifier = Modifier.weight(1f),
@@ -939,7 +939,7 @@ fun CustomTopBar(
                             imageVector = Icons.Default.Sort,
                             contentDescription = "Sort",
                             tint = Color.White,
-                            modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                     DropdownMenu(
@@ -974,7 +974,7 @@ fun CustomTopBar(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Refresh",
                         tint = if (isRefreshing) MaterialTheme.colorScheme.secondary else Color.White,
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
@@ -983,7 +983,7 @@ fun CustomTopBar(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",
                         tint = Color.White,
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }

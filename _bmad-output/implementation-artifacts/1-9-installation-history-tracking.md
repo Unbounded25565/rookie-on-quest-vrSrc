@@ -590,6 +590,7 @@ Gemini 2.4 Flash
 - Added history export functionality to text file in Downloads folder.
 - Modified `DownloadWorker.kt` to track actual download start time, enabling accurate download duration calculation in history.
 - Incremented `versionCode` (9→10) and updated `versionName` to `2.5.0-rc.1` in `build.gradle.kts`.
+- Fixed `CustomTopBar` layout issues by reducing icon sizes (30dp -> 24dp) and title font size (titleLarge -> titleMedium) to prevent truncation on smaller screens.
 - **Review Fixes Applied (Twenty-second Review):**
     - Corrected File List documentation to accurately reflect all 17 files created or modified in Story 1.9.
     - Added `proguard-rules.pro` to the File List.
