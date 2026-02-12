@@ -155,7 +155,7 @@ class InstallHistoryDaoTest {
         val queuedInstallDao = database.queuedInstallDao()
         val queueEntry = QueuedInstallEntity(
             releaseName = releaseName,
-            status = InstallStatus.DOWNLOADING,
+            status = InstallStatus.DOWNLOADING.name,
             progress = 0.5f,
             downloadedBytes = 2500L,
             totalBytes = totalBytes,

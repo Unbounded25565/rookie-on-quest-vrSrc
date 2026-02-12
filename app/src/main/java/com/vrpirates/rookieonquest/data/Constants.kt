@@ -180,6 +180,16 @@ object Constants {
     const val MAX_HISTORY_LIMIT = 1000
 
     /**
+     * Number of items to load per page in the history view.
+     */
+    const val HISTORY_PAGE_SIZE = 50
+
+    /**
+     * Number of items from the end of the list that triggers loading more items (pagination).
+     */
+    const val PAGINATION_TRIGGER_THRESHOLD = 5
+
+    /**
      * Minimum estimated APK size for space checks (500 MB).
      * Used when exact APK size is unknown during pre-flight space verification.
      * APK is staged to externalFilesDir before installation, requiring external storage space.
@@ -206,7 +216,8 @@ object DateTimeConstants {
 
     /**
      * Thread-safe formatter for installation history dates.
-     * Uses the system default timezone and locale.
+     * Uses the system default timezone (ZoneId.systemDefault()) and locale (Locale.getDefault()) 
+     * to ensure timestamps are displayed in the user's local time.
      */
     val HISTORY_DATE_FORMATTER: java.time.format.DateTimeFormatter by lazy {
         java.time.format.DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN, java.util.Locale.getDefault())

@@ -490,9 +490,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val queryToUse = if (query.isBlank()) null else query
             val minTimestamp = when (dateFilter) {
                 HistoryDateFilter.ALL -> null
-                HistoryDateFilter.LAST_7_DAYS -> System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000)
-                HistoryDateFilter.LAST_30_DAYS -> System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000)
-                HistoryDateFilter.LAST_3_MONTHS -> System.currentTimeMillis() - (90L * 24 * 60 * 60 * 1000)
+                HistoryDateFilter.LAST_7_DAYS -> {
+                    java.time.LocalDate.now()
+                        .minusDays(7)
+                        .atStartOfDay(java.time.ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                }
+                HistoryDateFilter.LAST_30_DAYS -> {
+                    java.time.LocalDate.now()
+                        .minusDays(30)
+                        .atStartOfDay(java.time.ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                }
+                HistoryDateFilter.LAST_3_MONTHS -> {
+                    java.time.LocalDate.now()
+                        .minusMonths(3)
+                        .atStartOfDay(java.time.ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                }
             }
             repository.db.installHistoryDao().searchAndFilterFlowWithLimitAndSort(
                 queryToUse,
@@ -509,37 +527,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val historyStats: StateFlow<HistoryStats?> = installHistory
         .flatMapLatest { _ -> // Re-calculate when history changes
             flow {
-                val dao = repository.db.installHistoryDao()
-                val successCount = dao.getCountByStatus(com.vrpirates.rookieonquest.data.InstallStatus.COMPLETED)
-                val failedCount = dao.getCountByStatus(com.vrpirates.rookieonquest.data.InstallStatus.FAILED)
-                val totalCount = successCount + failedCount
+                try {
+                    val dao = repository.db.installHistoryDao()
+                    val successCount = dao.getCountByStatus(com.vrpirates.rookieonquest.data.InstallStatus.COMPLETED)
+                    val failedCount = dao.getCountByStatus(com.vrpirates.rookieonquest.data.InstallStatus.FAILED)
+                    val totalCount = successCount + failedCount
 
-                if (totalCount == 0) {
-                    emit(null)
-                    return@flow
+                    if (totalCount == 0) {
+                        emit(null)
+                        return@flow
+                    }
+
+                    val avgDuration = dao.getAverageDuration(com.vrpirates.rookieonquest.data.InstallStatus.COMPLETED)
+                    val totalSize = dao.getTotalDownloadedSize(com.vrpirates.rookieonquest.data.InstallStatus.COMPLETED)
+                    val topGames = dao.getMostInstalledGames(3)
+                    val errorSummary = dao.getErrorSummary(5)
+
+                    emit(HistoryStats(
+                        successRate = if (totalCount > 0) successCount.toFloat() / totalCount else 0f,
+                        averageDurationMs = avgDuration,
+                        totalDownloadedBytes = totalSize,
+                        topGames = topGames.map { it.gameName },
+                        errorSummary = errorSummary.associate { it.errorMessage to it.count }
+                    ))
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to calculate history stats", e)
+                    emit(null) // Emit null on error instead of crashing the flow
                 }
-
-                val avgDuration = dao.getAverageDuration(com.vrpirates.rookieonquest.data.InstallStatus.COMPLETED)
-                val totalSize = dao.getTotalDownloadedSize(com.vrpirates.rookieonquest.data.InstallStatus.COMPLETED)
-                val topGames = dao.getMostInstalledGames(3)
-
-                val allHistory = dao.getAll()
-                val errors = allHistory
-                    .filter { !it.errorMessage.isNullOrBlank() }
-                    .groupBy { it.errorMessage!! }
-                    .mapValues { it.value.size }
-                    .toList()
-                    .sortedByDescending { it.second }
-                    .take(5)
-                    .toMap()
-
-                emit(HistoryStats(
-                    successRate = if (totalCount > 0) successCount.toFloat() / totalCount else 0f,
-                    averageDurationMs = avgDuration,
-                    totalDownloadedBytes = totalSize,
-                    topGames = topGames.map { it.gameName },
-                    errorSummary = errors
-                ))
             }
         }
         .flowOn(Dispatchers.IO)
@@ -552,22 +566,36 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Updates the history search query with validation.
-     * Limits query length to 100 characters to prevent performance/memory issues.
+     * Limits query length to 100 characters AFTER escaping to prevent performance/memory issues.
      *
      * NOTE: This method is responsible for escaping LIKE special characters (%, _, \)
      * to prevent SQL injection or unexpected pattern matching. The DAO provides the
      * corresponding ESCAPE '\' clause.
      */
     fun setHistoryQuery(query: String) {
-        val validatedQuery = if (query.length > 100) query.take(100) else query
         // Escape LIKE special characters (%, _, \) using \ as escape character
-        val escapedQuery = validatedQuery
+        val escapedQuery = query
             .replace("\\", "\\\\")
             .replace("%", "\\%")
             .replace("_", "\\_")
 
-        if (_historyQuery.value != escapedQuery) {
-            _historyQuery.value = escapedQuery
+        // Truncate to 100 characters AFTER escaping to ensure DB query size is capped
+        val validatedQuery = if (escapedQuery.length > 100) {
+            var truncated = escapedQuery.take(100)
+            // If we truncated in the middle of an escape sequence (trailing odd number of backslashes)
+            // we must remove the trailing backslash to avoid Room error.
+            var backslashCount = 0
+            for (i in truncated.length - 1 downTo 0) {
+                if (truncated[i] == '\\') backslashCount++ else break
+            }
+            if (backslashCount % 2 != 0) {
+                truncated = truncated.dropLast(1)
+            }
+            truncated
+        } else escapedQuery
+
+        if (_historyQuery.value != validatedQuery) {
+            _historyQuery.value = validatedQuery
             _historyLimit.value = 50 // Reset pagination
         }
     }
@@ -575,28 +603,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun setHistoryStatusFilter(status: com.vrpirates.rookieonquest.data.InstallStatus?) {
         if (_historyStatusFilter.value != status) {
             _historyStatusFilter.value = status
-            _historyLimit.value = 50 // Reset pagination
+            _historyLimit.value = Constants.HISTORY_PAGE_SIZE // Reset pagination
         }
     }
 
     fun setHistorySortMode(mode: HistorySortMode) {
         if (_historySortMode.value != mode) {
             _historySortMode.value = mode
-            _historyLimit.value = 50 // Reset pagination
+            _historyLimit.value = Constants.HISTORY_PAGE_SIZE // Reset pagination
         }
     }
 
     fun setHistoryDateFilter(filter: HistoryDateFilter) {
         if (_historyDateFilter.value != filter) {
             _historyDateFilter.value = filter
-            _historyLimit.value = 50 // Reset pagination
+            _historyLimit.value = Constants.HISTORY_PAGE_SIZE // Reset pagination
         }
     }
 
     fun loadMoreHistory() {
-        // Increment limit by 50, but cap to prevent excessive memory usage
+        // Increment limit by HISTORY_PAGE_SIZE, but cap to prevent excessive memory usage
         if (_historyLimit.value < Constants.MAX_HISTORY_LIMIT) {
-            _historyLimit.value += 50
+            _historyLimit.value += Constants.HISTORY_PAGE_SIZE
         } else {
             // Notify user that maximum history limit has been reached
             viewModelScope.launch {
@@ -629,12 +657,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun showMessage(message: String) {
+        viewModelScope.launch {
+            _events.emit(MainEvent.ShowMessage(message))
+        }
+    }
+
     fun exportHistory(format: String = "txt") {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _events.emit(MainEvent.ShowMessage("Exporting history ($format)..."))
-                val filePath = repository.exportHistory(format)
-                _events.emit(MainEvent.ShowMessage("History exported to: $filePath"))
+                val (filePath, scannerSuccess) = repository.exportHistory(format)
+                
+                if (scannerSuccess) {
+                    _events.emit(MainEvent.ShowMessage("History exported to: $filePath"))
+                } else {
+                    _events.emit(MainEvent.ShowMessage("Exported to $filePath (may take a moment to appear in file picker)"))
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to export history", e)
                 _events.emit(MainEvent.ShowMessage("Failed to export history: ${e.message}"))
@@ -1834,6 +1873,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Queue Management Methods
+    fun isGameInCatalog(releaseName: String): Boolean {
+        return _allGames.value.any { it.releaseName == releaseName }
+    }
+
     /**
      * Install a game with permission checking.
      *

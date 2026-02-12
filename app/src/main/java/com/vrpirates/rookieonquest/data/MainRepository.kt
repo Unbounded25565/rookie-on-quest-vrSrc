@@ -1898,7 +1898,14 @@ class MainRepository(
         fileName
     }
 
-    suspend fun exportHistory(format: String = "txt"): String = withContext(Dispatchers.IO) {
+    /**
+     * Exports the installation history to a file in the public Downloads/RookieOnQuest folder.
+     * @param format Export format ("txt" or "json")
+     * @return Pair of (absoluteFilePath, mediaScannerSuccess)
+     * @throws IllegalStateException if history is empty
+     * @throws IOException if file cannot be created or written
+     */
+    suspend fun exportHistory(format: String = "txt"): Pair<String, Boolean> = withContext(Dispatchers.IO) {
         val history = db.installHistoryDao().getAll()
         
         if (history.isEmpty()) {
@@ -1906,14 +1913,9 @@ class MainRepository(
         }
 
         // Max size validation (prevent OOM for extremely large history)
-        if (history.size > 10000) {
+        if (history.size > Constants.MAX_HISTORY_LIMIT) {
             Log.e(TAG, "exportHistory: History too large (${history.size} entries)")
             throw IllegalStateException("History is too large to export. Please clear history first.")
-        }
-        
-        // Size warning for history export (>1000 entries)
-        if (history.size > 1000) {
-            Log.w(TAG, "exportHistory: Large history detected (${history.size} entries). Exporting may be slow.")
         }
 
         if (!logsDir.exists() && !logsDir.mkdirs()) {
@@ -1926,8 +1928,8 @@ class MainRepository(
             throw IOException("Logs directory is not writable. Check storage permissions.")
         }
 
-        val fileFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
-        val timestamp = LocalDateTime.now().format(fileFormatter)
+        val fileFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+        val timestamp = java.time.LocalDateTime.now().format(fileFormatter)
         val extension = if (format.lowercase() == "json") "json" else "txt"
         val fileName = "rookie_history_$timestamp.$extension"
         val file = File(logsDir, fileName)
@@ -1935,21 +1937,21 @@ class MainRepository(
         val content = if (format.lowercase() == "json") {
             // Memory safety check specifically for JSON serialization (AC Review fix)
             // Although checked at the top of the method, this provides extra safety for the heavier JSON format
-            if (history.size > 10000) {
-                throw IllegalStateException("History is too large for JSON export (max 10,000 entries)")
+            if (history.size > Constants.MAX_HISTORY_LIMIT) {
+                throw IllegalStateException("History is too large for JSON export (max ${Constants.MAX_HISTORY_LIMIT} entries)")
             }
             com.google.gson.GsonBuilder().setPrettyPrinting().create().toJson(history)
         } else {
-            val displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.systemDefault())
+            val displayFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(java.time.ZoneId.systemDefault())
             
             val sb = StringBuilder()
             sb.append("ROOKIE ON QUEST - INSTALLATION HISTORY\n")
-            sb.append("Generated on: ${displayFormatter.format(Instant.now())}\n")
+            sb.append("Generated on: ${displayFormatter.format(java.time.Instant.now())}\n")
             sb.append("========================================\n\n")
             
             history.forEach { entry ->
-                val date = displayFormatter.format(Instant.ofEpochMilli(entry.installedAt))
+                val date = displayFormatter.format(java.time.Instant.ofEpochMilli(entry.installedAt))
                 val durationSeconds = entry.downloadDurationMs / 1000
                 sb.append("Game: ${entry.gameName}\n")
                 sb.append("Package: ${entry.packageName}\n")
@@ -1974,22 +1976,21 @@ class MainRepository(
             
             // Wait for MediaScanner to complete to ensure file is visible to other apps (AC 6)
             // Added timeout (AC Review) to prevent indefinite blocking
-            withTimeout(5000) {
-                suspendCancellableCoroutine<Unit> { continuation ->
-                    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { path, uri ->
-                        if (uri != null) {
-                            Log.i(TAG, "exportHistory: MediaScanner completed for $path, uri=$uri")
-                            continuation.resume(Unit)
-                        } else {
-                            Log.w(TAG, "exportHistory: MediaScanner failed for $path (uri is null)")
-                            // Resume anyway but log warning - file exists on disk but might not show in picker immediately
-                            continuation.resume(Unit)
+            val scannerSuccess = try {
+                withTimeout(5000) {
+                    suspendCancellableCoroutine<Boolean> { continuation ->
+                        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { _, uri ->
+                            continuation.resume(uri != null)
                         }
                     }
                 }
+            } catch (e: Exception) {
+                Log.w(TAG, "exportHistory: MediaScanner timed out or failed", e)
+                false
             }
             
-            compressExportIfNeeded(fileName)
+            val finalPath = compressExportIfNeeded(fileName)
+            finalPath to scannerSuccess
         } catch (e: Exception) {
             Log.e(TAG, "exportHistory: Failed to write history file", e)
             throw e

@@ -138,11 +138,19 @@ interface InstallHistoryDao {
     @Query("SELECT gameName, COUNT(*) as count FROM install_history GROUP BY gameName ORDER BY count DESC LIMIT :limit")
     suspend fun getMostInstalledGames(limit: Int): List<GameCount>
 
+    @Query("SELECT errorMessage, COUNT(*) as count FROM install_history WHERE errorMessage IS NOT NULL AND errorMessage != '' GROUP BY errorMessage ORDER BY count DESC LIMIT :limit")
+    suspend fun getErrorSummary(limit: Int): List<ErrorCount>
+
     @Query("SELECT COUNT(*) FROM install_history WHERE releaseName = :releaseName AND createdAt = :createdAt")
     suspend fun countByReleaseAndCreatedAt(releaseName: String, createdAt: Long): Int
 }
 
 data class GameCount(
     val gameName: String,
+    val count: Int
+)
+
+data class ErrorCount(
+    val errorMessage: String,
     val count: Int
 )

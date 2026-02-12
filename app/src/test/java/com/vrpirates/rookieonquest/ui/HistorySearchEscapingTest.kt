@@ -14,16 +14,29 @@ import org.junit.Test
 class HistorySearchEscapingTest {
 
     /**
-     * Replicates the escaping logic from MainViewModel.kt:561-572.
+     * Replicates the escaping logic from MainViewModel.kt.
      */
     private fun escapeQuery(query: String): String {
-        val validatedQuery = if (query.length > 100) query.take(100) else query
         // Escape LIKE special characters (%, _, \) using \ as escape character
-        // Order matters: \ must be replaced first
-        return validatedQuery
+        val escapedQuery = query
             .replace("\\", "\\\\")
             .replace("%", "\\%")
             .replace("_", "\\_")
+
+        // Truncate to 100 characters AFTER escaping
+        return if (escapedQuery.length > 100) {
+            var truncated = escapedQuery.take(100)
+            // If we truncated in the middle of an escape sequence (trailing odd number of backslashes)
+            // we must remove the trailing backslash to avoid Room error.
+            var backslashCount = 0
+            for (i in truncated.length - 1 downTo 0) {
+                if (truncated[i] == '\\') backslashCount++ else break
+            }
+            if (backslashCount % 2 != 0) {
+                truncated = truncated.dropLast(1)
+            }
+            truncated
+        } else escapedQuery
     }
 
     @Test
@@ -74,11 +87,39 @@ class HistorySearchEscapingTest {
         assertEquals(100, result.length)
         assertEquals("\\%".repeat(50), result)
         
-        // 100 percent signs -> truncated to 100 before escaping -> 200 characters after escaping
+        // 100 percent signs -> escapedQuery length is 200 -> truncated to 100 after escaping
         val longQuery = "%".repeat(150)
         val resultLong = escapeQuery(longQuery)
-        assertEquals(200, resultLong.length)
-        assertEquals("\\%".repeat(100), resultLong)
+        assertEquals(100, resultLong.length)
+        assertEquals("\\%".repeat(50), resultLong)
+    }
+
+    @Test
+    fun `test trailing backslash truncation`() {
+        // Setup: 49 'a's + '%' -> "a...a\%" (length 51)
+        // We want to force a truncation that leaves a single '\'
+        // If we have 99 'a's + '%' -> "a...a\%" (length 101)
+        // Truncate to 100 -> "a...a\" (backslash at 99)
+        // Logic should drop it to 99 chars
+        val query = "a".repeat(99) + "%"
+        val result = escapeQuery(query)
+        assertEquals(99, result.length)
+        assertEquals("a".repeat(99), result)
+
+        // Setup: 98 'a's + '\' -> "a...a\\" (length 100)
+        // No truncation needed
+        val query2 = "a".repeat(98) + "\\"
+        val result2 = escapeQuery(query2)
+        assertEquals(100, result2.length)
+        assertEquals("a".repeat(98) + "\\\\", result2)
+        
+        // Setup: 99 'a's + '\' -> "a...a\\" (length 101)
+        // Truncate to 100 -> "a...a\" (backslash at 99)
+        // Logic should drop it to 99 chars
+        val query3 = "a".repeat(99) + "\\"
+        val result3 = escapeQuery(query3)
+        assertEquals(99, result3.length)
+        assertEquals("a".repeat(99), result3)
     }
 
     @Test

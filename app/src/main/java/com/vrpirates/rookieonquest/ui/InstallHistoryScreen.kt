@@ -63,7 +63,7 @@ fun InstallHistoryScreen(
     LaunchedEffect(listState, canLoadMore) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .collect { lastIndex: Int? ->
-                if (canLoadMore && lastIndex != null && lastIndex >= history.size - 5) {
+                if (canLoadMore && lastIndex != null && lastIndex >= history.size - com.vrpirates.rookieonquest.data.Constants.PAGINATION_TRIGGER_THRESHOLD) {
                     viewModel.loadMoreHistory()
                 }
             }
@@ -301,8 +301,12 @@ fun InstallHistoryScreen(
                             entry = entry,
                             onDelete = { viewModel.deleteHistoryEntry(entry.id) },
                             onReinstall = { 
-                                viewModel.installGame(entry.releaseName)
-                                onBack() // Go back to main screen to see progress
+                                if (viewModel.isGameInCatalog(entry.releaseName)) {
+                                    viewModel.installGame(entry.releaseName)
+                                    onBack() // Go back to main screen to see progress
+                                } else {
+                                    viewModel.showMessage("Game no longer exists in catalog: ${entry.gameName}")
+                                }
                             }
                         )
                     }
