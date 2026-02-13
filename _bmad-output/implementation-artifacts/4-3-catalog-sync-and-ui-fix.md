@@ -261,6 +261,8 @@ Gemini 2.0 Flash
 - Round 17 code review findings - 9 items (Date: 2026-02-13)
     - Resolved all 9 findings (3 CRITICAL, 4 MEDIUM, 2 LOW).
     - Hardened synchronization logic by extending `catalogSyncMutex` to cover the entire update check and sync lifecycle.
+    - Resolved a critical deadlock issue where `syncCatalog` was re-acquiring a non-reentrant mutex already held by `refreshData`.
+    - Fixed a `PasswordRequiredException` in `CatalogUpdateWorker` by enabling password-protected 7z extraction using credentials from the repository.
     - Improved TopBar responsiveness with lower minimum font size (6.sp) for extreme narrow screens.
     - Enhanced integration test suite with coverage for "already up-to-date" skipping and background worker detection logic.
     - Documented 6-hour background check rationale and optimized real-time UI notification delivery.
