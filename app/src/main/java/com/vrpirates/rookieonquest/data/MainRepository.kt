@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.util.Base64
 import android.util.Log
 import com.vrpirates.rookieonquest.logic.CatalogParser
+import com.vrpirates.rookieonquest.logic.CatalogUtils
 import com.vrpirates.rookieonquest.network.PublicConfig
 import com.vrpirates.rookieonquest.network.VrpService
 import kotlinx.coroutines.*
@@ -59,7 +60,6 @@ class MainRepository(
     val db: AppDatabase = AppDatabase.getDatabase(context)
 ) {
     private val TAG = "MainRepository"
-    private val catalogMutex = Mutex()
     private val gameDao = db.gameDao()
 
     // Use shared network instances from NetworkModule (singleton)
@@ -102,6 +102,7 @@ class MainRepository(
                 val decoded = Base64.decode(config.password64, Base64.DEFAULT)
                 decodedPassword = String(decoded, Charsets.UTF_8)
             } catch (e: Exception) {
+                Log.w(TAG, "Failed to decode password64, using raw value: ${e.message}")
                 decodedPassword = config.password64
             }
             config
@@ -111,87 +112,152 @@ class MainRepository(
         }
     }
 
-    suspend fun syncCatalog(baseUri: String) = withContext(Dispatchers.IO) {
-        catalogMutex.withLock {
-            Log.i(TAG, "Starting catalog sync from: $baseUri")
-            val sanitizedBase = if (baseUri.endsWith("/")) baseUri else "$baseUri/"
-            val metaUrl = "${sanitizedBase}meta.7z"
-            
-            try {
-                val lastModified = getRemoteLastModified(metaUrl)
-                val savedModified = prefs.getString("meta_last_modified", "")
-                Log.d(TAG, "Remote last modified: $lastModified, saved: $savedModified")
+        suspend fun syncCatalog(baseUri: String, onProgress: (Float) -> Unit = {}) = withContext(Dispatchers.IO) {
+            CatalogUtils.catalogSyncMutex.withLock {
+                Log.i(TAG, "Starting catalog sync from: $baseUri")
+                // Progress weighted by estimated duration of each phase:
+                // 5% for initial handshake and metadata check
+                onProgress(0.05f) 
+                val sanitizedBase = if (baseUri.endsWith("/")) baseUri else "$baseUri/"
+                val metaUrl = "${sanitizedBase}meta.7z"
                 
-                if (catalogCacheFile.exists() && lastModified == savedModified && lastModified != null && gameDao.getCount() > 0) {
-                    Log.i(TAG, "Catalog is up to date, skipping sync")
-                    return@withLock
-                }
-
-                Log.i(TAG, "Downloading catalog meta file: $metaUrl")
-                val tempMetaFile = File.createTempFile("meta_", ".7z", context.cacheDir)
                 try {
-                    downloadFile(metaUrl, tempMetaFile)
-                    Log.d(TAG, "Meta file downloaded, size: ${tempMetaFile.length()} bytes")
-
-                    val passwordsToTry = listOfNotNull(decodedPassword, cachedConfig?.password64, null).distinct()
-                    var gameListContent = ""
-                    var success = false
-
-                    for (pass in passwordsToTry) {
-                        try {
-                            Log.d(TAG, "Attempting extraction with password: ${if (pass != null) "****" else "none"}")
-                            extractMetaToCache(tempMetaFile, pass) { content -> gameListContent = content }
-                            success = true
-                            Log.i(TAG, "Extraction successful")
-                            break
-                        } catch (e: Exception) {
-                            Log.w(TAG, "Extraction failed with password attempt: ${e.message}")
-                        }
+                    val metadata = CatalogUtils.getRemoteCatalogMetadata(baseUri)
+                    val lastModified = metadata["Last-Modified"]
+                    val etag = metadata["ETag"]
+                    val md5 = metadata["MD5"]
+    
+                    val savedModified = prefs.getString("meta_last_modified", "")
+                    val savedETag = prefs.getString("meta_etag", "")
+                    val savedMD5 = prefs.getString("meta_md5", "")
+    
+                    Log.d(TAG, "Remote metadata: $metadata")
+                    Log.d(TAG, "Saved: modified=$savedModified, etag=$savedETag, md5=$savedMD5")
+    
+                    // Fixed short-circuit: Use OR (||) grouping with proper parentheses
+                    // Each condition group: (header exists AND matches saved)
+                    val upToDate = catalogCacheFile.exists() && gameDao.getCount() > 0 && (
+                        (lastModified != null && lastModified == savedModified) ||
+                        (etag != null && etag == savedETag) ||
+                        (md5 != null && md5 == savedMD5)
+                    )
+    
+                    if (upToDate) {
+                        Log.i(TAG, "Catalog is up to date, skipping sync")
+                        // Full progress reached immediately if already current
+                        onProgress(1f) 
+                        return@withContext
                     }
-
-                    if (success && gameListContent.isNotEmpty()) {
-                        if (lastModified != null) {
-                            prefs.edit().putString("meta_last_modified", lastModified).apply()
+    
+                    // 10% progress: download start.
+                    onProgress(0.1f) 
+                    Log.i(TAG, "Downloading catalog meta file: $metaUrl")
+                    val tempMetaFile = CatalogUtils.getCatalogMetaFile(context)
+                    try {
+                        // Avoid double download if the worker just fetched the file (Story 4.3 Round 4 Fix)
+                        // We trust the file is fresh if it exists and was modified recently (Story 4.3 Round 11 Fix)
+                        val isFresh = tempMetaFile.exists() && 
+                                     tempMetaFile.length() > 0 && 
+                                     (System.currentTimeMillis() - tempMetaFile.lastModified() < CatalogUtils.CACHE_FRESHNESS_THRESHOLD_MS)
+    
+                        if (isFresh) {
+                            Log.i(TAG, "Using recently cached meta file from worker")
+                        } else {
+                            downloadFile(metaUrl, tempMetaFile)
                         }
-                        Log.i(TAG, "Parsing catalog content...")
-                        val newList = CatalogParser.parse(gameListContent)
-                        Log.i(TAG, "Parsed ${newList.size} games")
-                        
-                        val existingData = gameDao.getAllGamesList().associateBy { it.releaseName }
-                        
-                        val entities = newList.map { game ->
-                            val existing = existingData[game.releaseName]
-                            val isNewOrUpdated = existing == null || existing.versionCode != game.versionCode
-                            
-                            // Local description check
-                            val localNote = File(notesDir, "${game.releaseName}.txt")
-                            val description = if (localNote.exists()) localNote.readText() else existing?.description ?: game.description
-                            
-                            game.copy(
-                                sizeBytes = game.sizeBytes ?: existing?.sizeBytes,
-                                description = description,
-                                isFavorite = existing?.isFavorite ?: false,
-                                lastUpdated = if (isNewOrUpdated) System.currentTimeMillis() else (existing?.lastUpdated ?: System.currentTimeMillis()),
-                                popularity = game.popularity
-                            ).toEntity()
+    
+                        // 50% progress: download complete, starting extraction.
+                        // Extraction is the most CPU intensive part on Quest hardware.
+                        onProgress(0.5f) 
+                        Log.d(TAG, "Meta file ready, size: ${tempMetaFile.length()} bytes")
+    
+                        val passwordsToTry = listOfNotNull(decodedPassword, cachedConfig?.password64, null).distinct()
+                        var gameListContent = ""
+                        var success = false
+    
+                        for (pass in passwordsToTry) {
+                            try {
+                                Log.d(TAG, "Attempting extraction with password: ${if (pass != null) "****" else "none"}")
+                                extractMetaToCache(tempMetaFile, pass) { content -> gameListContent = content }
+                                success = true
+                                Log.i(TAG, "Extraction successful")
+                                break
+                            } catch (e: Exception) {
+                                Log.w(TAG, "Extraction failed with password attempt: ${e.message}")
+                            }
                         }
-                        
-                        Log.i(TAG, "Inserting ${entities.size} games into database")
-                        gameDao.insertGames(entities)
-                        Log.i(TAG, "Catalog sync complete")
-                    } else {
-                        Log.e(TAG, "Failed to extract catalog content or content empty")
+    
+                        if (success && gameListContent.isNotEmpty()) {
+                            // 70% progress: extraction done, starting parsing.
+                            onProgress(0.7f) 
+                            Log.i(TAG, "Parsing catalog content...")
+                            val newList = CatalogParser.parse(gameListContent)
+                            Log.i(TAG, "Parsed ${newList.size} games")
+                            
+                            // 85% progress: parse done, starting database insertion.
+                            // Bulk insertion takes significant time on large catalogs.
+                            onProgress(0.85f) 
+    
+                            val existingData = gameDao.getAllGamesList().associateBy { it.releaseName }
+    
+                            val entities = newList.map { game ->
+                                val existing = existingData[game.releaseName]
+                                val isNewOrUpdated = existing == null || existing.versionCode != game.versionCode
+    
+                                // Local description check
+                                val localNote = File(notesDir, "${game.releaseName}.txt")
+                                val description = if (localNote.exists()) localNote.readText() else existing?.description ?: game.description
+    
+                                game.copy(
+                                    sizeBytes = game.sizeBytes ?: existing?.sizeBytes,
+                                    description = description,
+                                    isFavorite = existing?.isFavorite ?: false,
+                                    lastUpdated = if (isNewOrUpdated) System.currentTimeMillis() else (existing?.lastUpdated ?: System.currentTimeMillis()),
+                                    popularity = game.popularity
+                                ).toEntity()
+                            }
+    
+                            Log.i(TAG, "Inserting ${entities.size} games into database")
+                            try {
+                                gameDao.insertGames(entities)
+                                // 95% progress: DB insertion done, finalizing metadata.
+                                onProgress(0.95f)
+    
+                                // Clear background update flags and save metadata under lock (Story 4.3 Round 11 Fix)
+                                // This ensures atomicity between saving sync state and clearing notification flags.
+    
+                                // Save metadata AFTER successful database insertion (Story 4.3 Round 4 Fix)
+                                CatalogUtils.saveMetadata(context, metadata)
+    
+                                // Also save to notified_meta_ to prevent re-detection by worker (Story 4.3 Round 5 Fix)
+                                CatalogUtils.saveMetadata(context, metadata, "notified_meta_")
+    
+                                prefs.edit().apply {
+                                    putBoolean("catalog_update_available", false)
+                                    putInt("catalog_update_count", 0)
+                                    apply()
+                                }
+    
+                                // 100% progress: all done.
+                                onProgress(1f) 
+                                Log.i(TAG, "Catalog sync complete")
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Failed to insert games into database", e)
+                                throw e
+                            }
+                        } else {
+                            throw Exception("Catalog extraction failed or content empty")
+                        }
+                    } catch (e: Exception) {
+                        // Propagate to outer handler
+                        throw e
                     }
-                } finally {
-                    if (tempMetaFile.exists()) tempMetaFile.delete()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Critical error during catalog sync: ${e.message}", e)
+                    throw e
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error during catalog sync: ${e.message}", e)
-                throw e
             }
         }
-    }
-
     private fun extractMetaToCache(file: File, password: String?, onGameListFound: (String) -> Unit) {
         val builder = SevenZFile.builder().setFile(file)
         if (password != null) builder.setPassword(password.toCharArray())
@@ -201,8 +267,7 @@ class MainRepository(
             val sharedBuffer = ByteArray(DownloadUtils.DOWNLOAD_BUFFER_SIZE)
             var entry = sevenZFile.nextEntry
             while (entry != null) {
-                val entryName = entry.name.lowercase()
-                if (entryName.endsWith("vrp-gamelist.txt")) {
+                if (entry.name.endsWith("VRP-GameList.txt", ignoreCase = true)) {
                     val out = java.io.ByteArrayOutputStream()
                     var bytesRead: Int
                     while (sevenZFile.read(sharedBuffer).also { bytesRead = it } != -1) {
@@ -211,19 +276,19 @@ class MainRepository(
                     val content = out.toString("UTF-8")
                     catalogCacheFile.writeText(content)
                     onGameListFound(content)
-                } else if (entryName.contains("/thumbnails/")) {
+                } else if (entry.name.contains("/thumbnails/", ignoreCase = true)) {
                     val fileName = entry.name.substringAfterLast("/")
                     if (fileName.isNotEmpty()) {
                         val targetFile = File(thumbnailsDir, fileName)
                         saveEntryToFile(sevenZFile, targetFile, sharedBuffer)
                     }
-                } else if (entryName.contains("/notes/")) {
+                } else if (entry.name.contains("/notes/", ignoreCase = true)) {
                     val fileName = entry.name.substringAfterLast("/")
                     if (fileName.isNotEmpty()) {
                         val targetFile = File(notesDir, fileName)
                         saveEntryToFile(sevenZFile, targetFile, sharedBuffer)
                     }
-                } else if (entryName.endsWith(".png") || entryName.endsWith(".jpg")) {
+                } else if (entry.name.endsWith(".png", ignoreCase = true) || entry.name.endsWith(".jpg", ignoreCase = true)) {
                     val fileName = entry.name.substringAfterLast("/")
                     val iconFile = File(iconsDir, fileName)
                     if (!iconFile.exists()) {

@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,16 +42,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -61,6 +65,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.core.content.FileProvider
 import com.vrpirates.rookieonquest.ui.*
+import com.vrpirates.rookieonquest.ui.components.CatalogUpdateBanner
 import com.vrpirates.rookieonquest.ui.theme.RookieOnQuestTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -82,7 +87,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel = viewModel()) {
     val games by viewModel.games.collectAsState()
@@ -98,6 +103,9 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
     val missingPermissions by viewModel.missingPermissions.collectAsState()
     val alphabetInfo by viewModel.alphabetInfo.collectAsState()
     val keepApks by viewModel.keepApks.collectAsState()
+    val isCatalogUpdateAvailable by viewModel.isCatalogUpdateAvailable.collectAsState()
+    val catalogUpdateCount by viewModel.catalogUpdateCount.collectAsState()
+    val catalogSyncProgress by viewModel.catalogSyncProgress.collectAsState()
 
     // Navigation state
     var currentScreen by remember { mutableStateOf("catalog") }
@@ -426,8 +434,21 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                             }
                         ) { innerPadding ->
                             Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
-                                Row(modifier = Modifier.fillMaxSize()) {
-                                    if (games.isNotEmpty() && searchQuery.isEmpty() && selectedFilter == FilterStatus.ALL && sortMode == SortMode.NAME_ASC) {
+                                Column(modifier = Modifier.fillMaxSize().animateContentSize()) {
+                                    AnimatedVisibility(
+                                        visible = isCatalogUpdateAvailable,
+                                        enter = expandVertically() + fadeIn(),
+                                        exit = shrinkVertically() + fadeOut()
+                                    ) {
+                                        CatalogUpdateBanner(
+                                            updateCount = catalogUpdateCount,
+                                            onSyncNow = { viewModel.syncCatalogNow() },
+                                            onDismiss = { viewModel.dismissCatalogUpdate() }
+                                        )
+                                    }
+
+                                    Row(modifier = Modifier.weight(1f)) {
+                                        if (games.isNotEmpty() && searchQuery.isEmpty() && selectedFilter == FilterStatus.ALL && sortMode == SortMode.NAME_ASC) {
                                         AlphabetIndexer(
                                             alphabetInfo = alphabetInfo,
                                             onLetterClick = { index ->
@@ -457,9 +478,9 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                                             contentPadding = PaddingValues(12.dp),
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                             verticalItemSpacing = 8.dp,
-                                            modifier = Modifier.weight(1f).fillMaxHeight()
+                                            modifier = Modifier.weight(1f).fillMaxHeight().animateContentSize()
                                         ) {
-                                            items(games, key = { it.packageName + it.releaseName }) { game ->
+                                            items(games, key = { it.releaseName }) { game ->
                                                 GameListItem(
                                                     game = game,
                                                     onInstallClick = { viewModel.installGame(game.releaseName) },
@@ -469,7 +490,8 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                                                     onResumeClick = { viewModel.resumeInstall(game.releaseName) },
                                                     onToggleFavorite = { viewModel.toggleFavorite(game.releaseName, it) },
                                                     isGridItem = true,
-                                                    permissionsMissing = missingPermissions?.isNotEmpty() == true
+                                                    permissionsMissing = missingPermissions?.isNotEmpty() == true,
+                                                    modifier = Modifier.animateItemPlacement()
                                                 )
                                             }
                                         }
@@ -477,9 +499,9 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                                         LazyColumn(
                                             state = listState,
                                             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
-                                            modifier = Modifier.weight(1f).fillMaxHeight()
+                                            modifier = Modifier.weight(1f).fillMaxHeight().animateContentSize()
                                         ) {
-                                            items(games, key = { it.packageName + it.releaseName }) { game ->
+                                            items(games, key = { it.releaseName }) { game ->
                                                 GameListItem(
                                                     game = game,
                                                     onInstallClick = { viewModel.installGame(game.releaseName) },
@@ -488,15 +510,17 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                                                     onDeleteDownloadClick = { gameToDelete = game },
                                                     onResumeClick = { viewModel.resumeInstall(game.releaseName) },
                                                     onToggleFavorite = { viewModel.toggleFavorite(game.releaseName, it) },
-                                                    permissionsMissing = missingPermissions?.isNotEmpty() == true
+                                                    permissionsMissing = missingPermissions?.isNotEmpty() == true,
+                                                    modifier = Modifier.animateItemPlacement()
                                                 )
                                             }
                                         }
                                     }
                                 }
+                            }
 
                                 if (isRefreshing && games.isNotEmpty()) {
-                                    SyncingOverlay()
+                                    SyncingOverlay(catalogSyncProgress, catalogUpdateCount)
                                 }
                             }
                         }
@@ -538,8 +562,8 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
         if (gameToDelete != null) {
             AlertDialog(
                 onDismissRequest = { gameToDelete = null },
-                title = { Text("Delete Download?") },
-                text = { Text("Are you sure you want to delete the downloaded files for ${gameToDelete?.name}?") },
+                title = { Text(stringResource(R.string.dialog_delete_download_title)) },
+                text = { Text(stringResource(R.string.dialog_delete_download_msg, gameToDelete?.name ?: "")) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -548,12 +572,12 @@ fun MainScreen(viewModel: MainViewModel = viewModel()) {
                         },
                         colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFCF6679))
                     ) {
-                        Text("DELETE", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.btn_delete), fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { gameToDelete = null }) {
-                        Text("CANCEL")
+                        Text(stringResource(R.string.btn_cancel))
                     }
                 },
                 containerColor = Color(0xFF1E1E1E),
@@ -844,13 +868,13 @@ fun UpdateOverlay(
     onConfirm: () -> Unit
 ) {
     SetupLayout(
-        title = "Update Available",
-        subtitle = "A new version of Rookie is available. Keeping the app up to date ensures compatibility with the latest games.",
+        title = stringResource(R.string.update_available_title),
+        subtitle = stringResource(R.string.update_available_desc),
         icon = Icons.Default.NewReleases,
         iconColor = Color(0xFF3498db),
-        primaryButtonText = "UPDATE NOW",
+        primaryButtonText = stringResource(R.string.btn_update_now),
         onPrimaryClick = onConfirm,
-        secondaryButtonText = "LATER",
+        secondaryButtonText = stringResource(R.string.btn_later),
         onSecondaryClick = onDismiss,
         isScrollable = true
     ) {
@@ -878,6 +902,49 @@ fun UpdateOverlay(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ResponsiveTitle(text: String, modifier: Modifier = Modifier) {
+    BoxWithConstraints(modifier = modifier) {
+        val maxWidth = maxWidth
+        val textMeasurer = rememberTextMeasurer()
+        val density = LocalDensity.current
+        val style = MaterialTheme.typography.titleSmall.copy(
+            fontWeight = FontWeight.Black
+        )
+
+        val fontSize = remember(text, maxWidth, density) {
+            var currentSize = 11.sp
+            while (currentSize > 6.sp) {
+                val result = textMeasurer.measure(
+                    text = text,
+                    style = style.copy(
+                        fontSize = currentSize,
+                        letterSpacing = if (currentSize < 11.sp) (-0.5).sp else 0.sp
+                    ),
+                    maxLines = 1,
+                    softWrap = false
+                )
+                if (result.size.width <= with(density) { maxWidth.toPx() }) {
+                    break
+                }
+                currentSize = (currentSize.value - 0.5f).sp
+            }
+            currentSize
+        }
+
+        Text(
+            text = text,
+            style = style.copy(
+                fontSize = fontSize,
+                letterSpacing = if (fontSize < 11.sp) (-0.5).sp else 0.sp
+            ),
+            color = Color.White,
+            maxLines = 1,
+            softWrap = false
+        )
     }
 }
 
@@ -921,16 +988,9 @@ fun CustomTopBar(
                     )
                 }
 
-                Text(
+                ResponsiveTitle(
                     text = "ROOKIE ON QUEST",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 1.sp
-                    ),
-                    color = Color.White,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    modifier = Modifier.weight(1f)
                 )
 
                 Box {
@@ -1127,7 +1187,7 @@ fun CustomTopBar(
 }
 
 @Composable
-fun SyncingOverlay() {
+fun SyncingOverlay(progress: Float? = null, updateCount: Int = 0) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -1137,19 +1197,64 @@ fun SyncingOverlay() {
         Card(
             modifier = Modifier.padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+            colors = CardDefaults.cardColors(containerColor = if (progress == -1f) Color(0xFFB00020) else Color(0xFF1A1A1A))
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.secondary
+                Text(
+                    text = stringResource(R.string.catalog_syncing_title),
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text("Syncing catalog...", color = Color.White, fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (progress != null && progress >= 0) {
+                        CircularProgressIndicator(
+                            progress = progress,
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else if (progress != -1f) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    val text = when {
+                        progress == -1f -> stringResource(R.string.catalog_sync_failed)
+                        progress != null && progress >= 0 -> {
+                            if (updateCount > 0) {
+                                stringResource(R.string.catalog_syncing_with_count, updateCount, (progress * 100).toInt())
+                            } else {
+                                stringResource(R.string.catalog_syncing_progress, (progress * 100).toInt())
+                            }
+                        }
+                        else -> {
+                            if (updateCount > 0) {
+                                stringResource(R.string.catalog_syncing_with_count_simple, updateCount)
+                            } else {
+                                stringResource(R.string.catalog_syncing)
+                            }
+                        }
+                    }
+                    Text(text, color = Color.White, fontSize = 14.sp)
+                }
             }
         }
     }

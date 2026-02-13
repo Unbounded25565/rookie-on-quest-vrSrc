@@ -52,7 +52,8 @@ fun GameListItem(
     onResumeClick: () -> Unit = {},
     onToggleFavorite: (Boolean) -> Unit = {},
     isGridItem: Boolean = false,
-    permissionsMissing: Boolean = false
+    permissionsMissing: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -88,7 +89,7 @@ fun GameListItem(
     val isEnabled = (game.installStatus != InstallStatus.INSTALLED || canResume) && !isProcessing && (game.queueStatus == null || canResume)
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 4.dp)
             .scale(scale)
@@ -282,7 +283,7 @@ fun GameListItem(
                     // Metadata Info
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             InfoItem("Release Name", game.releaseName)
