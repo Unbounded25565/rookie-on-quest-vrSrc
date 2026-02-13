@@ -421,6 +421,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _isUpdateDownloading = MutableStateFlow(false)
     val isUpdateDownloading: StateFlow<Boolean> = _isUpdateDownloading
 
+    private val _isCatalogUpdateAvailable = MutableStateFlow(prefs.getBoolean("catalog_update_available", false))
+    val isCatalogUpdateAvailable: StateFlow<Boolean> = _isCatalogUpdateAvailable
+
+    private val _catalogUpdateCount = MutableStateFlow(prefs.getInt("catalog_update_count", 0))
+    val catalogUpdateCount: StateFlow<Int> = _catalogUpdateCount
+
+    private val _catalogSyncProgress = MutableStateFlow<Float?>(null)
+    val catalogSyncProgress: StateFlow<Float?> = _catalogSyncProgress
+
     private val _updateProgress = MutableStateFlow("")
     val updateProgress: StateFlow<String> = _updateProgress
 
@@ -740,6 +749,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Use shared OkHttpClient from NetworkModule (singleton)
     private val okHttpClient = NetworkModule.okHttpClient
 
+    private val prefListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "catalog_update_available" || key == "catalog_update_count") {
+            Log.d(TAG, "SharedPreferences changed: $key, triggering real-time UI update")
+            // Optimize: Update StateFlows directly instead of calling checkCatalogUpdate()
+            // to avoid redundant preference reads and potential race conditions (Finding 8)
+            viewModelScope.launch {
+                when (key) {
+                    "catalog_update_available" -> _isCatalogUpdateAvailable.value = prefs.getBoolean(key, false)
+                    "catalog_update_count" -> _catalogUpdateCount.value = prefs.getInt(key, 0)
+                }
+            }
+        }
+    }
+
     private val _allGames = repository.getAllGamesFlow()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -935,9 +958,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), InstallState())
 
-    init {
-        // Initialize PermissionManager with application context
-        com.vrpirates.rookieonquest.data.PermissionManager.init(getApplication())
+        init {
+            // Register listener for catalog updates
+            prefs.registerOnSharedPreferenceChangeListener(prefListener)
+            // Perform immediate check to ensure initial state consistency (Story 4.3 Round 14 Fix)
+            checkCatalogUpdate()
+    
+            // Initialize PermissionManager with application context
+            com.vrpirates.rookieonquest.data.PermissionManager.init(getApplication())
+        // Schedule background catalog update check
+        scheduleCatalogUpdateWorker()
 
         // Load and validate saved permission states on startup
         viewModelScope.launch {
@@ -1340,8 +1370,71 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 viewModelScope.launch {
                     repository.verifyAndCleanupInstalls()
                 }
+                // Check if a catalog update was found in background
+                checkCatalogUpdate()
             }
         }
+    }
+
+    private fun checkCatalogUpdate() {
+        val available = prefs.getBoolean("catalog_update_available", false)
+        val count = prefs.getInt("catalog_update_count", 0)
+        if (_isCatalogUpdateAvailable.value != available) {
+            _isCatalogUpdateAvailable.value = available
+        }
+        if (_catalogUpdateCount.value != count) {
+            _catalogUpdateCount.value = count
+        }
+    }
+
+    fun dismissCatalogUpdate() {
+        // Update UI state immediately for responsive feedback
+        _isCatalogUpdateAvailable.value = false
+        _catalogUpdateCount.value = 0
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            com.vrpirates.rookieonquest.logic.CatalogUtils.catalogSyncMutex.withLock {
+                prefs.edit().apply {
+                    putBoolean("catalog_update_available", false)
+                    putInt("catalog_update_count", 0)
+                    apply()
+                }
+            }
+        }
+    }
+
+    fun syncCatalogNow() {
+        // Hiding the banner immediately provides better UX response.
+        // The background flags will be cleared by repository upon successful sync.
+        _isCatalogUpdateAvailable.value = false
+        refreshData()
+    }
+
+    private fun scheduleCatalogUpdateWorker() {
+        val constraints = androidx.work.Constraints.Builder()
+            .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+            .build()
+
+        // Rationale for 6 hours: Provides a balance between timely updates and battery/data efficiency.
+        // Mirrors typically sync daily, so 4 checks per day ensures users see changes within hours
+        // without excessive background activity. (Finding 7)
+        val request = androidx.work.PeriodicWorkRequestBuilder<com.vrpirates.rookieonquest.worker.CatalogUpdateWorker>(
+            6, TimeUnit.HOURS
+        )
+            .setConstraints(constraints)
+            .setBackoffCriteria(
+                androidx.work.BackoffPolicy.EXPONENTIAL,
+                10L,
+                TimeUnit.SECONDS
+            )
+            .build()
+
+        androidx.work.WorkManager.getInstance(getApplication())
+            .enqueueUniquePeriodicWork(
+                "catalog_update_check",
+                androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+                request
+            )
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -1421,23 +1514,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             val now = System.currentTimeMillis()
             _isRefreshing.value = true
+            _catalogSyncProgress.value = 0f
             _error.value = null
             try {
-                withContext(Dispatchers.IO) {
-                    // 1. Sync Catalog first to have the latest games list
-                    val config = repository.fetchConfig()
-                    repository.syncCatalog(config.baseUri)
+                // Shared Mutex coordination: Protect the entire synchronization flow to prevent
+                // concurrent database writes or metadata race conditions between the manual
+                // UI-triggered sync and the background CatalogUpdateWorker.
+                com.vrpirates.rookieonquest.logic.CatalogUtils.catalogSyncMutex.withLock {
+                    withContext(Dispatchers.IO) {
+                        // 1. Sync Catalog first to have the latest games list
+                        val config = repository.fetchConfig()
+                        repository.syncCatalog(config.baseUri) { progress ->
+                            _catalogSyncProgress.value = progress
+                        }
 
-                    // 2. Refresh statuses now that we have the latest catalog
-                    // We get the fresh games list directly to be immediate
-                    val freshGames = repository.getAllGamesFlow().first()
+                        // 2. Refresh statuses now that we have the latest catalog
+                        // We get the fresh games list directly to be immediate
+                        val freshGames = repository.getAllGamesFlow().first()
 
-                    val installed = repository.getInstalledPackagesMap()
-                    _installedPackages.value = installed
-                    refreshDownloadedReleases(freshGames)
+                        val installed = repository.getInstalledPackagesMap()
+                        _installedPackages.value = installed
+                        refreshDownloadedReleases(freshGames)
 
-                    // Store current sync time after successful sync
-                    prefs.edit().putLong("last_catalog_sync_time", now).apply()
+                        // Store current sync time after successful sync
+                        prefs.edit().putLong("last_catalog_sync_time", now).apply()
+                    }
                 }
                 priorityUpdateChannel.trySend(Unit)
             } catch (e: Exception) {
@@ -1445,6 +1546,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _error.value = "Error: ${e.message}"
             } finally {
                 _isRefreshing.value = false
+                _catalogSyncProgress.value = null
             }
         }
     }
@@ -3067,4 +3169,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        prefs.unregisterOnSharedPreferenceChangeListener(prefListener)
+    }
 }

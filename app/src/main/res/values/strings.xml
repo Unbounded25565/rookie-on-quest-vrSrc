@@ -67,4 +67,29 @@
     <string name="game_btn_download">DOWNLOAD</string>
     <string name="game_btn_uninstall">UNINSTALL</string>
     <string name="game_btn_delete_download">DELETE DOWNLOAD</string>
+
+    <!-- Story 4.3: App Update Strings -->
+    <string name="update_available_title">Update Available</string>
+    <string name="update_available_desc">A new version of Rookie is available. Keeping the app up to date ensures compatibility with the latest games.</string>
+    <string name="btn_update_now">UPDATE NOW</string>
+
+    <!-- Story 4.3: Dialog Strings -->
+    <string name="dialog_delete_download_title">Delete Download?</string>
+    <string name="dialog_delete_download_msg">Are you sure you want to delete the downloaded files for %1$s?</string>
+    <string name="btn_delete">DELETE</string>
+
+    <!-- Story 4.3: Catalog Update Strings -->
+    <string name="catalog_update_title">New Catalog Available</string>
+    <string name="catalog_update_message">%1$d games added/updated. Sync now to see the latest games.</string>
+    <string name="catalog_update_message_simple">Sync now to see the latest games and updates.</string>
+    <string name="catalog_btn_dismiss">DISMISS</string>
+    <string name="catalog_btn_sync_now">SYNC NOW</string>
+    <string name="catalog_update_calculating">Calculating changes...</string>
+
+    <string name="catalog_sync_failed">Sync failed. Try again from Settings.</string>
+    <string name="catalog_syncing_title">CATALOG SYNC</string>
+    <string name="catalog_syncing_progress">Syncing catalog... %1$d%%</string>
+    <string name="catalog_syncing_with_count">Syncing %1$d new/updated games... %2$d%%</string>
+    <string name="catalog_syncing_with_count_simple">Syncing %1$d new/updated games...</string>
+    <string name="catalog_syncing">Syncing catalog...</string>
 </resources>

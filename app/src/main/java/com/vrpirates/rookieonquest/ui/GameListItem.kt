@@ -52,7 +52,8 @@ fun GameListItem(
     onResumeClick: () -> Unit = {},
     onToggleFavorite: (Boolean) -> Unit = {},
     isGridItem: Boolean = false,
-    permissionsMissing: Boolean = false
+    permissionsMissing: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -88,7 +89,7 @@ fun GameListItem(
     val isEnabled = (game.installStatus != InstallStatus.INSTALLED || canResume) && !isProcessing && (game.queueStatus == null || canResume)
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 4.dp)
             .scale(scale)
@@ -280,18 +281,28 @@ fun GameListItem(
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     // Metadata Info
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
+                    if (isGridItem) {
+                        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             InfoItem("Release Name", game.releaseName)
                             if (game.popularity > 0) {
                                 InfoItem("Popularity", "⭐ ${game.popularity}")
                             }
-                        }
-                        Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
                             InfoItem("Last Updated", formatDate(game.lastUpdated))
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                InfoItem("Release Name", game.releaseName)
+                                if (game.popularity > 0) {
+                                    InfoItem("Popularity", "⭐ ${game.popularity}")
+                                }
+                            }
+                            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.End) {
+                                InfoItem("Last Updated", formatDate(game.lastUpdated))
+                            }
                         }
                     }
                     

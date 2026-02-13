@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.util.Base64
 import android.util.Log
 import com.vrpirates.rookieonquest.logic.CatalogParser
+import com.vrpirates.rookieonquest.logic.CatalogUtils
 import com.vrpirates.rookieonquest.network.PublicConfig
 import com.vrpirates.rookieonquest.network.VrpService
 import kotlinx.coroutines.*
@@ -59,7 +60,6 @@ class MainRepository(
     val db: AppDatabase = AppDatabase.getDatabase(context)
 ) {
     private val TAG = "MainRepository"
-    private val catalogMutex = Mutex()
     private val gameDao = db.gameDao()
 
     // Use shared network instances from NetworkModule (singleton)
@@ -69,7 +69,7 @@ class MainRepository(
     private val prefs = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
 
     private var cachedConfig: PublicConfig? = null
-    private var decodedPassword: String? = null
+    internal var decodedPassword: String? = null
     
     val iconsDir = File(context.filesDir, "icons").apply { if (!exists()) mkdirs() }
     val thumbnailsDir = File(context.filesDir, "thumbnails").apply { if (!exists()) mkdirs() }
@@ -102,6 +102,7 @@ class MainRepository(
                 val decoded = Base64.decode(config.password64, Base64.DEFAULT)
                 decodedPassword = String(decoded, Charsets.UTF_8)
             } catch (e: Exception) {
+                Log.w(TAG, "Failed to decode password64, using raw value: ${e.message}")
                 decodedPassword = config.password64
             }
             config
@@ -111,88 +112,168 @@ class MainRepository(
         }
     }
 
-    suspend fun syncCatalog(baseUri: String) = withContext(Dispatchers.IO) {
-        catalogMutex.withLock {
-            Log.i(TAG, "Starting catalog sync from: $baseUri")
-            val sanitizedBase = if (baseUri.endsWith("/")) baseUri else "$baseUri/"
-            val metaUrl = "${sanitizedBase}meta.7z"
+                suspend fun syncCatalog(baseUri: String, onProgress: (Float) -> Unit = {}) = withContext(Dispatchers.IO) {
+                    Log.i(TAG, "Starting catalog sync from: $baseUri")
+                    // Progress weighted by estimated duration of each phase:
+                    // 5% for initial handshake and metadata check
+                    onProgress(0.05f) 
+                    val sanitizedBase = if (baseUri.endsWith("/")) baseUri else "$baseUri/"
+                    val metaUrl = "${sanitizedBase}meta.7z"
+                    
+                    try {
+                        Log.d(TAG, "syncCatalog: checking remote metadata...")
+                        val metadata = CatalogUtils.getRemoteCatalogMetadata(baseUri)
+                        Log.d(TAG, "syncCatalog: remote metadata: $metadata")
+                        val lastModified = metadata["Last-Modified"]
+                        val etag = metadata["ETag"]
+                        val md5 = metadata["MD5"]
             
-            try {
-                val lastModified = getRemoteLastModified(metaUrl)
-                val savedModified = prefs.getString("meta_last_modified", "")
-                Log.d(TAG, "Remote last modified: $lastModified, saved: $savedModified")
-                
-                if (catalogCacheFile.exists() && lastModified == savedModified && lastModified != null && gameDao.getCount() > 0) {
-                    Log.i(TAG, "Catalog is up to date, skipping sync")
-                    return@withLock
-                }
-
-                Log.i(TAG, "Downloading catalog meta file: $metaUrl")
-                val tempMetaFile = File.createTempFile("meta_", ".7z", context.cacheDir)
-                try {
-                    downloadFile(metaUrl, tempMetaFile)
-                    Log.d(TAG, "Meta file downloaded, size: ${tempMetaFile.length()} bytes")
-
-                    val passwordsToTry = listOfNotNull(decodedPassword, cachedConfig?.password64, null).distinct()
-                    var gameListContent = ""
-                    var success = false
-
-                    for (pass in passwordsToTry) {
+                        val savedModified = prefs.getString("meta_last_modified", "")
+                        val savedETag = prefs.getString("meta_etag", "")
+                        val savedMD5 = prefs.getString("meta_md5", "")
+            
+                        Log.d(TAG, "syncCatalog: saved metadata: modified=$savedModified, etag=$savedETag, md5=$savedMD5")
+            
+                        // Fixed short-circuit: Use OR (||) grouping with proper parentheses
+                        // Each condition group: (header exists AND matches saved)
+                        val upToDate = catalogCacheFile.exists() && gameDao.getCount() > 0 && (
+                            (lastModified != null && lastModified == savedModified) ||
+                            (etag != null && etag == savedETag) ||
+                            (md5 != null && md5 == savedMD5)
+                        )
+            
+                        if (upToDate) {
+                            Log.i(TAG, "Catalog is up to date, skipping sync")
+                            
+                            // Ensure banner is dismissed if we're already up to date
+                            prefs.edit().apply {
+                                putBoolean("catalog_update_available", false)
+                                putInt("catalog_update_count", 0)
+                                apply()
+                            }
+                            
+                            // Full progress reached immediately if already current
+                            onProgress(1f) 
+                            return@withContext
+                        }
+            
+                        // 10% progress: download start.
+                        onProgress(0.1f) 
+                        Log.i(TAG, "Downloading catalog meta file: $metaUrl")
+                        val tempMetaFile = CatalogUtils.getCatalogMetaFile(context)
                         try {
-                            Log.d(TAG, "Attempting extraction with password: ${if (pass != null) "****" else "none"}")
-                            extractMetaToCache(tempMetaFile, pass) { content -> gameListContent = content }
-                            success = true
-                            Log.i(TAG, "Extraction successful")
-                            break
+                            // Avoid double download if the worker just fetched the file (Story 4.3 Round 4 Fix)
+                            // We trust the file is fresh if it exists and was modified recently (Story 4.3 Round 11 Fix)
+                            val isFresh = tempMetaFile.exists() && 
+                                         tempMetaFile.length() > 0 && 
+                                         (System.currentTimeMillis() - tempMetaFile.lastModified() < CatalogUtils.CACHE_FRESHNESS_THRESHOLD_MS)
+            
+                            if (isFresh) {
+                                Log.i(TAG, "Using recently cached meta file from worker")
+                            } else {
+                                Log.d(TAG, "syncCatalog: calling downloadFile...")
+                                CatalogUtils.downloadFile(metaUrl, tempMetaFile)
+                                Log.d(TAG, "syncCatalog: downloadFile finished")
+                            }
+            
+                            // 50% progress: download complete, starting extraction.
+                            // Extraction is the most CPU intensive part on Quest hardware.
+                            onProgress(0.5f) 
+                            Log.d(TAG, "Meta file ready, size: ${tempMetaFile.length()} bytes")
+            
+                            val passwordsToTry = (listOfNotNull(decodedPassword, cachedConfig?.password64) + listOf<String?>(null)).distinct()
+                            var gameListContent = ""
+                            var success = false
+            
+                            for (pass in passwordsToTry) {
+                                try {
+                                    Log.d(TAG, "Attempting extraction with password: ${if (pass != null) "****" else "none"}")
+                                    extractMetaToCache(tempMetaFile, pass) { content -> gameListContent = content }
+                                    success = true
+                                    Log.i(TAG, "Extraction successful")
+                                    break
+                                } catch (e: Exception) {
+                                    Log.w(TAG, "Extraction failed with password attempt: ${e.message}")
+                                }
+                            }
+            
+                            if (success && gameListContent.isNotEmpty()) {
+                                // 70% progress: extraction done, starting parsing.
+                                onProgress(0.7f) 
+                                Log.i(TAG, "Parsing catalog content...")
+                                val newList = CatalogParser.parse(gameListContent)
+                                Log.i(TAG, "Parsed ${newList.size} games")
+                                
+                                // 85% progress: parse done, starting database insertion.
+                                // Bulk insertion takes significant time on large catalogs.
+                                onProgress(0.85f) 
+            
+                                Log.d(TAG, "syncCatalog: preparing database entities...")
+                                val existingData = gameDao.getAllGamesList().associateBy { it.releaseName }
+            
+                                val entities = newList.map { game ->
+                                    val existing = existingData[game.releaseName]
+                                    val isNewOrUpdated = existing == null || existing.versionCode != game.versionCode
+            
+                                    // Local description check
+                                    val localNote = File(notesDir, "${game.releaseName}.txt")
+                                    val description = if (localNote.exists()) localNote.readText() else existing?.description ?: game.description
+            
+                                    game.copy(
+                                        sizeBytes = game.sizeBytes ?: existing?.sizeBytes,
+                                        description = description,
+                                        isFavorite = existing?.isFavorite ?: false,
+                                        lastUpdated = if (isNewOrUpdated) System.currentTimeMillis() else (existing?.lastUpdated ?: System.currentTimeMillis()),
+                                        popularity = game.popularity
+                                    ).toEntity()
+                                }
+            
+                                Log.i(TAG, "Inserting ${entities.size} games into database")
+                                try {
+                                    gameDao.insertGames(entities)
+                                    // 95% progress: DB insertion done, finalizing metadata.
+                                    onProgress(0.95f)
+            
+                                    // Clear background update flags and save metadata under lock (Story 4.3 Round 11 Fix)
+                                    // This ensures atomicity between saving sync state and clearing notification flags.
+            
+                                    // Save metadata AFTER successful database insertion (Story 4.3 Round 4 Fix)
+                                    Log.d(TAG, "syncCatalog: saving metadata...")
+                                    CatalogUtils.saveMetadata(context, metadata)
+            
+                                    // Also save to notified_meta_ to prevent re-detection by worker (Story 4.3 Round 5 Fix)
+                                    CatalogUtils.saveMetadata(context, metadata, "notified_meta_")
+            
+                                    prefs.edit().apply {
+                                        putBoolean("catalog_update_available", false)
+                                        putInt("catalog_update_count", 0)
+                                        apply()
+                                    }
+            
+                                    // 100% progress: all done.
+                                    onProgress(1f) 
+                                    Log.i(TAG, "Catalog sync complete")
+                                } catch (e: Exception) {
+                                    Log.e(TAG, "Failed to insert games into database", e)
+                                    onProgress(-1f)
+                                    throw e
+                                }
+                            } else {
+                                onProgress(-1f)
+                                throw Exception("Catalog extraction failed or content empty")
+                            }
                         } catch (e: Exception) {
-                            Log.w(TAG, "Extraction failed with password attempt: ${e.message}")
+                            Log.e(TAG, "syncCatalog: error during sync: ${e.message}", e)
+                            onProgress(-1f)
+                            throw e
                         }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Critical error during catalog sync: ${e.message}", e)
+                        onProgress(-1f)
+                        throw e
                     }
-
-                    if (success && gameListContent.isNotEmpty()) {
-                        if (lastModified != null) {
-                            prefs.edit().putString("meta_last_modified", lastModified).apply()
-                        }
-                        Log.i(TAG, "Parsing catalog content...")
-                        val newList = CatalogParser.parse(gameListContent)
-                        Log.i(TAG, "Parsed ${newList.size} games")
-                        
-                        val existingData = gameDao.getAllGamesList().associateBy { it.releaseName }
-                        
-                        val entities = newList.map { game ->
-                            val existing = existingData[game.releaseName]
-                            val isNewOrUpdated = existing == null || existing.versionCode != game.versionCode
-                            
-                            // Local description check
-                            val localNote = File(notesDir, "${game.releaseName}.txt")
-                            val description = if (localNote.exists()) localNote.readText() else existing?.description ?: game.description
-                            
-                            game.copy(
-                                sizeBytes = game.sizeBytes ?: existing?.sizeBytes,
-                                description = description,
-                                isFavorite = existing?.isFavorite ?: false,
-                                lastUpdated = if (isNewOrUpdated) System.currentTimeMillis() else (existing?.lastUpdated ?: System.currentTimeMillis()),
-                                popularity = game.popularity
-                            ).toEntity()
-                        }
-                        
-                        Log.i(TAG, "Inserting ${entities.size} games into database")
-                        gameDao.insertGames(entities)
-                        Log.i(TAG, "Catalog sync complete")
-                    } else {
-                        Log.e(TAG, "Failed to extract catalog content or content empty")
-                    }
-                } finally {
-                    if (tempMetaFile.exists()) tempMetaFile.delete()
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error during catalog sync: ${e.message}", e)
-                throw e
-            }
-        }
-    }
-
-    private fun extractMetaToCache(file: File, password: String?, onGameListFound: (String) -> Unit) {
+                        private fun extractMetaToCache(file: File, password: String?, onGameListFound: (String) -> Unit) {
         val builder = SevenZFile.builder().setFile(file)
         if (password != null) builder.setPassword(password.toCharArray())
 
@@ -201,8 +282,7 @@ class MainRepository(
             val sharedBuffer = ByteArray(DownloadUtils.DOWNLOAD_BUFFER_SIZE)
             var entry = sevenZFile.nextEntry
             while (entry != null) {
-                val entryName = entry.name.lowercase()
-                if (entryName.endsWith("vrp-gamelist.txt")) {
+                if (entry.name.endsWith("VRP-GameList.txt", ignoreCase = true)) {
                     val out = java.io.ByteArrayOutputStream()
                     var bytesRead: Int
                     while (sevenZFile.read(sharedBuffer).also { bytesRead = it } != -1) {
@@ -211,19 +291,19 @@ class MainRepository(
                     val content = out.toString("UTF-8")
                     catalogCacheFile.writeText(content)
                     onGameListFound(content)
-                } else if (entryName.contains("/thumbnails/")) {
+                } else if (entry.name.contains("/thumbnails/", ignoreCase = true)) {
                     val fileName = entry.name.substringAfterLast("/")
                     if (fileName.isNotEmpty()) {
                         val targetFile = File(thumbnailsDir, fileName)
                         saveEntryToFile(sevenZFile, targetFile, sharedBuffer)
                     }
-                } else if (entryName.contains("/notes/")) {
+                } else if (entry.name.contains("/notes/", ignoreCase = true)) {
                     val fileName = entry.name.substringAfterLast("/")
                     if (fileName.isNotEmpty()) {
                         val targetFile = File(notesDir, fileName)
                         saveEntryToFile(sevenZFile, targetFile, sharedBuffer)
                     }
-                } else if (entryName.endsWith(".png") || entryName.endsWith(".jpg")) {
+                } else if (entry.name.endsWith(".png", ignoreCase = true) || entry.name.endsWith(".jpg", ignoreCase = true)) {
                     val fileName = entry.name.substringAfterLast("/")
                     val iconFile = File(iconsDir, fileName)
                     if (!iconFile.exists()) {
@@ -248,32 +328,6 @@ class MainRepository(
             var bytesRead: Int
             while (sevenZFile.read(buffer).also { bytesRead = it } != -1) {
                 out.write(buffer, 0, bytesRead)
-            }
-        }
-    }
-
-    private suspend fun Call.await(): Response = suspendCancellableCoroutine { continuation ->
-        continuation.invokeOnCancellation {
-            cancel()
-        }
-        enqueue(object : Callback {
-            override fun onResponse(call: Call, response: Response) {
-                continuation.resume(response)
-            }
-            override fun onFailure(call: Call, e: IOException) {
-                continuation.resumeWithException(e)
-            }
-        })
-    }
-
-    private suspend fun downloadFile(url: String, targetFile: File) {
-        val request = Request.Builder().url(url).header("User-Agent", Constants.USER_AGENT).build()
-        okHttpClient.newCall(request).await().use { response ->
-            if (!response.isSuccessful) throw Exception("HTTP ${response.code}")
-            response.body?.byteStream()?.use { input ->
-                targetFile.outputStream().use { output -> 
-                    copyToCancellable(input, output)
-                }
             }
         }
     }
@@ -997,110 +1051,131 @@ class MainRepository(
 
                     // Note: Skip separate "Preparing extraction" call here - merge already ended at 85%
                     // The counting phase will maintain 85% until extraction starts
-                    val password = decodedPassword ?: ""
+                    // Try multiple password variants for extraction robustness (Story 4.3 Round 20 Fix)
+                    val passwordsToTry = (listOfNotNull(decodedPassword, cachedConfig?.password64) + listOf<String?>(null)).distinct()
+                    var extractionSuccess = false
+                    var lastExtractionError: Exception? = null
 
-                    SevenZFile.builder().setFile(combinedFile).setPassword(password.toCharArray()).get().use { sevenZFile ->
-                        // Count total entries for progress calculation (Story 1.6)
-                        // SevenZFile.entries provides an Iterable that can be iterated without consuming entries
-                        var totalEntryBytes = 0L
-                        var totalEntryCount = 0
-                        sevenZFile.entries.forEachIndexed { index, entry ->
-                            totalEntryBytes += entry.size
-                            totalEntryCount++
-                            // Update progress during counting for large archives (Code Review fix)
-                            // Stays at EXTRACTING (85%) - counting is part of extraction phase, not a step back
-                            if (index % 100 == 0) {
-                                currentCoroutineContext().ensureActive()
-                                onProgress("Analyzing archive...", Constants.PROGRESS_MILESTONE_EXTRACTING, 0, 0)
-                            }
-                        }
-                        // Use entry count as fallback for archives with only zero-byte entries (e.g., directories only)
-                        // This prevents progress from freezing at 85% when totalEntryBytes = 0
-                        val useEntryCount = totalEntryBytes == 0L && totalEntryCount > 0
-
-                        var extractedBytes = 0L
-                        var extractedEntryCount = 0
-                        var lastProgressUpdateMs = 0L
-                        // Extraction spans 85-92% for monotonic progress (not 85-100% which causes backwards jump to 94%/96% for OBB/APK)
-                        val extractionPhaseSpan = Constants.PROGRESS_MILESTONE_EXTRACTION_END - Constants.PROGRESS_MILESTONE_EXTRACTING
-                        // Reuse buffer across all files to reduce GC pressure
-                        val extractionBuffer = ByteArray(DownloadUtils.DOWNLOAD_BUFFER_SIZE)
-                        // Cache canonical path outside loop to avoid repeated IO calls
-                        val canonicalExtractDir = extractionDir.canonicalPath
-
-                        var entry = sevenZFile.nextEntry
-                        while (entry != null) {
-                            currentCoroutineContext().ensureActive()
-                            // Keep APK, OBB and EVERYTHING ELSE (important for Quake3Quest style structures)
-                            val outFile = File(extractionDir, entry.name)
-
-                            // Zip Slip vulnerability protection: Validate that the resolved path
-                            // is within the extraction directory to prevent directory traversal attacks
-                            val canonicalOutFile = outFile.canonicalPath
-                            if (!canonicalOutFile.startsWith(canonicalExtractDir + File.separator) &&
-                                canonicalOutFile != canonicalExtractDir) {
-                                val errorMsg = "Zip Slip detected! Malicious entry: ${entry.name}"
-                                Log.e(TAG, errorMsg)
-                                // Fail loudly instead of skipping silently to prevent broken installations (Adversarial Review fix)
-                                throw IOException(errorMsg)
-                            }
-
-                            if (entry.isDirectory) outFile.mkdirs()
-                            else {
-                                outFile.parentFile?.let { if (!it.exists()) it.mkdirs() }
-                                FileOutputStream(outFile).use { out ->
-                                    var bytesRead: Int
-                                    while (true) {
+                    for (pass in passwordsToTry) {
+                        try {
+                            Log.d(TAG, "Attempting extraction with password: ${if (pass != null) "****" else "none"}")
+                            SevenZFile.builder().setFile(combinedFile).setPassword(pass?.toCharArray()).get().use { sevenZFile ->
+                                // Count total entries for progress calculation (Story 1.6)
+                                // SevenZFile.entries provides an Iterable that can be iterated without consuming entries
+                                var totalEntryBytes = 0L
+                                var totalEntryCount = 0
+                                sevenZFile.entries.forEachIndexed { index, entry ->
+                                    totalEntryBytes += entry.size
+                                    totalEntryCount++
+                                    // Update progress during counting for large archives (Code Review fix)
+                                    // Stays at EXTRACTING (85%) - counting is part of extraction phase, not a step back
+                                    if (index % 100 == 0) {
                                         currentCoroutineContext().ensureActive()
-                                        bytesRead = sevenZFile.read(extractionBuffer)
-                                        if (bytesRead == -1) break
-                                        out.write(extractionBuffer, 0, bytesRead)
-
-                                        // Track actual bytes extracted for progress (NFR-P10 fix)
-                                        // Update inside loop to prevent UI freeze during large file extraction
-                                        extractedBytes += bytesRead
-                                        // Use monotonic clock for throttling to avoid issues with system time changes
-                                        val now = SystemClock.elapsedRealtime()
-                                        if (now - lastProgressUpdateMs >= Constants.EXTRACTION_PROGRESS_THROTTLE_MS) {
-                                            // Use entry count as fallback for zero-byte archives
-                                            val extractionProgress = when {
-                                                useEntryCount -> extractedEntryCount.toFloat() / totalEntryCount
-                                                totalEntryBytes > 0 -> extractedBytes.toFloat() / totalEntryBytes
-                                                else -> 0f
-                                            }
-                                            // Scale extraction progress: 85-92% of total (monotonic before OBB at 94%, APK at 96%)
-                                            val scaledProgress = Constants.PROGRESS_MILESTONE_EXTRACTING +
-                                                    (extractionProgress * extractionPhaseSpan)
-                                            onProgress(
-                                                "Extracting... ${(extractionProgress * 100).toInt()}%",
-                                                scaledProgress,
-                                                extractedBytes,
-                                                totalEntryBytes
-                                            )
-                                            lastProgressUpdateMs = now
-                                        }
+                                        onProgress("Analyzing archive...", Constants.PROGRESS_MILESTONE_EXTRACTING, 0, 0)
                                     }
                                 }
+                                // Use entry count as fallback for archives with only zero-byte entries (e.g., directories only)
+                                // This prevents progress from freezing at 85% when totalEntryBytes = 0
+                                val useEntryCount = totalEntryBytes == 0L && totalEntryCount > 0
+
+                                var extractedBytes = 0L
+                                var extractedEntryCount = 0
+                                var lastProgressUpdateMs = 0L
+                                // Extraction spans 85-92% for monotonic progress (not 85-100% which causes backwards jump to 94%/96% for OBB/APK)
+                                val extractionPhaseSpan = Constants.PROGRESS_MILESTONE_EXTRACTION_END - Constants.PROGRESS_MILESTONE_EXTRACTING
+                                // Reuse buffer across all files to reduce GC pressure
+                                val extractionBuffer = ByteArray(DownloadUtils.DOWNLOAD_BUFFER_SIZE)
+                                // Cache canonical path outside loop to avoid repeated IO calls
+                                val canonicalExtractDir = extractionDir.canonicalPath
+
+                                var entry = sevenZFile.nextEntry
+                                while (entry != null) {
+                                    currentCoroutineContext().ensureActive()
+                                    // Keep APK, OBB and EVERYTHING ELSE (important for Quake3Quest style structures)
+                                    val outFile = File(extractionDir, entry.name)
+
+                                    // Zip Slip vulnerability protection: Validate that the resolved path
+                                    // is within the extraction directory to prevent directory traversal attacks
+                                    val canonicalOutFile = outFile.canonicalPath
+                                    if (!canonicalOutFile.startsWith(canonicalExtractDir + File.separator) &&
+                                        canonicalOutFile != canonicalExtractDir) {
+                                        val errorMsg = "Zip Slip detected! Malicious entry: ${entry.name}"
+                                        Log.e(TAG, errorMsg)
+                                        // Fail loudly instead of skipping silently to prevent broken installations (Adversarial Review fix)
+                                        throw IOException(errorMsg)
+                                    }
+
+                                    if (entry.isDirectory) outFile.mkdirs()
+                                    else {
+                                        outFile.parentFile?.let { if (!it.exists()) it.mkdirs() }
+                                        FileOutputStream(outFile).use { out ->
+                                            var bytesRead: Int
+                                            while (true) {
+                                                currentCoroutineContext().ensureActive()
+                                                bytesRead = sevenZFile.read(extractionBuffer)
+                                                if (bytesRead == -1) break
+                                                out.write(extractionBuffer, 0, bytesRead)
+
+                                                // Track actual bytes extracted for progress (NFR-P10 fix)
+                                                // Update inside loop to prevent UI freeze during large file extraction
+                                                extractedBytes += bytesRead
+                                                // Use monotonic clock for throttling to avoid issues with system time changes
+                                                val now = SystemClock.elapsedRealtime()
+                                                if (now - lastProgressUpdateMs >= Constants.EXTRACTION_PROGRESS_THROTTLE_MS) {
+                                                    // Use entry count as fallback for zero-byte archives
+                                                    val extractionProgress = when {
+                                                        useEntryCount -> extractedEntryCount.toFloat() / totalEntryCount
+                                                        totalEntryBytes > 0 -> extractedBytes.toFloat() / totalEntryBytes
+                                                        else -> 0f
+                                                    }
+                                                    // Scale extraction progress: 85-92% of total (monotonic before OBB at 94%, APK at 96%)
+                                                    val scaledProgress = Constants.PROGRESS_MILESTONE_EXTRACTING +
+                                                            (extractionProgress * extractionPhaseSpan)
+                                                    onProgress(
+                                                        "Extracting... ${(extractionProgress * 100).toInt()}%",
+                                                        scaledProgress,
+                                                        extractedBytes,
+                                                        totalEntryBytes
+                                                    )
+                                                    lastProgressUpdateMs = now
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Increment entry counter for progress tracking (used as fallback for zero-byte archives)
+                                    extractedEntryCount++
+                                    entry = sevenZFile.nextEntry
+                                }
                             }
-
-                            // Increment entry counter for progress tracking (used as fallback for zero-byte archives)
-                            extractedEntryCount++
-                            entry = sevenZFile.nextEntry
+                            extractionSuccess = true
+                            Log.i(TAG, "Extraction successful with password variant")
+                            break
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Extraction attempt failed with password: ${e.message}")
+                            lastExtractionError = e
+                            // Clean up partial extraction for next password attempt
+                            extractionDir.deleteRecursively()
+                            extractionDir.mkdirs()
                         }
+                    }
 
-                        // Final progress update to ensure we reach EXTRACTION_END milestone
-                        // This handles cases where the last chunk didn't trigger a throttled update
-                        onProgress(
-                            "Extraction complete",
-                            Constants.PROGRESS_MILESTONE_EXTRACTION_END,
-                            extractedBytes,
-                            totalEntryBytes
-                        )
+                    if (!extractionSuccess) {
+                        throw lastExtractionError ?: Exception("Extraction failed with all password variants")
+                    }
 
-                        // Log if extraction took >2 minutes (NFR-P11 compliance)
-                        if (WakeLockManager.hasExceededTwoMinutes()) {
-                            Log.i(TAG, "Extraction completed after ${WakeLockManager.getHeldDurationMs() / 1000}s (wake lock held)")
-                        }
+                    // Final progress update to ensure we reach EXTRACTION_END milestone
+                    // This handles cases where the last chunk didn't trigger a throttled update
+                    onProgress(
+                        "Extraction complete",
+                        Constants.PROGRESS_MILESTONE_EXTRACTION_END,
+                        0, // Bytes info not strictly needed for final status
+                        0
+                    )
+
+                    // Log if extraction took >2 minutes (NFR-P11 compliance)
+                    if (WakeLockManager.hasExceededTwoMinutes()) {
+                        Log.i(TAG, "Extraction completed after ${WakeLockManager.getHeldDurationMs() / 1000}s (wake lock held)")
                     }
                     extractionMarker.createNewFile()
                 } catch (e: CancellationException) {
