@@ -268,6 +268,7 @@ Gemini 2.0 Flash
     - Documented 6-hour background check rationale and optimized real-time UI notification delivery.
     - Cleaned up technical documentation and progress reporting milestones.
     - Successfully aligned git branch state with story completion status.
+    - Fixed an issue where the catalog refresh button was disabled when permissions were missing, despite browsing not requiring them.
 
 ### File List
 

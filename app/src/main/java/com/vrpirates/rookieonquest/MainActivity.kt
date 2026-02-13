@@ -1029,7 +1029,7 @@ fun CustomTopBar(
                     }
                 }
 
-                IconButton(onClick = onRefreshClick, enabled = !isInstalling && !permissionsMissing) {
+                IconButton(onClick = onRefreshClick, enabled = !isInstalling) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Refresh",
