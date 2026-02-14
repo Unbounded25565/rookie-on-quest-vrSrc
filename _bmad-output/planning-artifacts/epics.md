@@ -589,6 +589,32 @@ So that I understand why each permission is needed.
 **And** detects battery optimization status (FR54)
 **And** stores permission grant state to avoid re-requesting
 
+### Story 1.9: Installation History Tracking
+(Added during sprint) Tracking of successfully installed games to provide user feedback and avoid redundant installations.
+
+### Story 1.10: Fix Queue Processor StateFlow Race Condition
+(Added during sprint) Resolution of race conditions in the queue processor to ensure UI state remains synchronized with background workers.
+
+### Story 1.11: Fix Staged APK Cross-Contamination
+(Added during sprint) Implementation of isolated directories for each game in `staged_apks` to prevent file conflicts during concurrent or sequential operations.
+
+### Story 1.12: Fast-Track Local Install
+(Added during sprint) Ability to install games already present in the staging area, skipping download and extraction.
+
+### Story 1.13: Shelving Ready-to-Install Games & Local Installs Tab
+
+As a user,
+I want games that are extracted but not yet installed to move out of the active queue,
+So that they don't block subsequent downloads and I can install them later from a dedicated "Local Installs" view.
+
+**Acceptance Criteria:**
+
+**Given** a game has reached the `READY_TO_INSTALL` state
+**When** the user does not immediately complete the installation
+**Then** the `QueueProcessor` moves the item to a `SHELVED` status to unblock the queue
+**And** the game appears in a new "Local Installs" tab
+**And** user can trigger a one-click installation from this tab using the already extracted files
+
 ## Epic 2: Enhanced Progress Visualization
 
 Users always know exactly what's happening during downloads and installations through an engaging animated stickman character that represents each operation phase with global progress tracking.
