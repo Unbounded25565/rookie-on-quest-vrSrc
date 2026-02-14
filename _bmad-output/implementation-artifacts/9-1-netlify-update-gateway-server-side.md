@@ -29,7 +29,7 @@ so that I can serve update metadata and APK download links securely to authorize
 5. **APK Storage**:
     - APK files MUST be stored in a non-indexed directory (e.g., `Sunshine-AIO-web/public/updates/rookie/`).
     - The `downloadUrl` should point to this location.
-    - *Note: For initial implementation/testing, a placeholder APK is acceptable. Real APKs should be deployed via CI/CD.*
+    - *Note: For initial implementation/testing, a placeholder APK is explicitly intentional. Real APKs will be deployed via CI/CD.*
 6. **Implementation Style**:
     - Use ESM (`export const handler = ...`) consistent with existing functions like `chat.js`.
     - Use Node.js 18 as specified in `netlify.toml`.
@@ -73,6 +73,21 @@ so that I can serve update metadata and APK download links securely to authorize
 - [x] [AI-Review][MEDIUM] Add security headers to _headers file - Cache-Control, X-Frame-Options: DENY, Content-Security-Policy for APK downloads [Sunshine-AIO-web/public/_headers]
 - [x] [AI-Review][MEDIUM] Test function in actual Netlify environment - verify process.cwd() resolution works in serverless context, not just local tests [Deployment testing]
 - [x] [AI-Review][LOW] Verify AC compliance after fixes - currently only 2/6 ACs working, need to validate all 6 before marking done [All Acceptance Criteria]
+
+#### Round 3 (2026-02-14) - ADVERSARIAL REVIEW ROUND 3 (13 Issues Found)
+- [x] [AI-Review][CRITICAL] Fix overly permissive CORS - replace `Access-Control-Allow-Origin: *` with explicit allowlist for authorized domains (rookie.vrpirates.org) to prevent malicious apps from exploiting update endpoint [Sunshine-AIO-web/netlify/functions/check-update.js:8]
+- [x] [AI-Review][CRITICAL] Replace placeholder APK (52 bytes) with actual built APK file (~15-50 MB) OR update AC #5 to explicitly state "placeholder for testing only" [Sunshine-AIO-web/public/updates/rookie/RookieOnQuest_2.5.0.apk]
+- [x] [AI-Review][CRITICAL] Implement timestamp validation - verify X-Rookie-Date is within ±5 minutes of server time to prevent replay attacks, currently timestamp used for HMAC but never validated [Sunshine-AIO-web/netlify/functions/check-update.js:21-22, 44-46]
+- [x] [AI-Review][MEDIUM] Add Cache-Control header to JSON response - set `Cache-Control: public, max-age=300` (5 minutes) to prevent indefinite caching of update metadata by CDNs/clients [Sunshine-AIO-web/netlify/functions/check-update.js:84-91]
+- [x] [AI-Review][MEDIUM] Optimize file reading - consider implementing in-memory cache for version.json to reduce disk I/O on every request, or verify Netlify's caching behavior [Sunshine-AIO-web/netlify/functions/check-update.js:72]
+- [x] [AI-Review][MEDIUM] Remove duplicate path in _headers - consolidate `/updates/*` and `/updates/rookie/*` rules as second is already covered by first [Sunshine-AIO-web/public/_headers:1-11]
+- [x] [AI-Review][MEDIUM] Expand test coverage - add tests for timestamp validation (future dates, replay attacks), invalid HTTP methods (POST/DELETE), and edge cases [Sunshine-AIO-web/tests/check-update.test.js]
+- [x] [AI-Review][MEDIUM] Fix header typo - change `X-Content-Type-Options: nosniff` to correct `nosniff` (double 's') in _headers file [Sunshine-AIO-web/public/_headers:4, 9]
+- [x] [AI-Review][LOW] Add server-side checksum verification - validate APK exists and SHA256 matches declared checksum before returning downloadUrl to client [Sunshine-AIO-web/netlify/functions/check-update.js:69-91]
+- [x] [AI-Review][LOW] Align directory structure with AC #5 specification - currently AC specifies `Sunshine-AIO-web/public/updates/rookie/` but _headers uses `/updates/*` paths [Sunshine-AIO-web/public/_headers:1-11]
+- [x] [AI-Review][LOW] Enhance error logging - replace `console.error()` with structured logging (request ID, timestamps) for production Netlify Functions monitoring [Sunshine-AIO-web/netlify/functions/check-update.js:34, 94]
+- [x] [AI-Review][LOW] Add JSDoc comments to metadata response block - document URL resolution logic and headers generation for maintainability [Sunshine-AIO-web/netlify/functions/check-update.js:69-99]
+- [x] [AI-Review][LOW] Add negative test cases - add tests for malformed headers, invalid date formats, corrupted JSON, and other edge cases beyond current positive/negative scenarios [Sunshine-AIO-web/tests/check-update.test.js]
 
 ## Dev Notes
 
