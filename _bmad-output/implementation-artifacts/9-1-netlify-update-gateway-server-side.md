@@ -1,6 +1,6 @@
 # Story 9.1: Netlify Update Gateway (Server-side)
 
-Status: review
+Status: in-progress
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -190,6 +190,15 @@ so that I can serve update metadata and APK download links securely to authorize
 - [x] [AI-Review][MEDIUM] Standardize error message quotes - use consistent single quotes in all JSON error responses across check-update.js for uniform error formatting and programmatic parsing (currently mix of single and double quotes) [check-update.js:79, 113, 164, 208, 226, 266]
 - [x] [AI-Review][LOW] Clarify Completion Notes inconsistency - resolve Round 8 notes stating "verified typos were already correct" with actual Round 10 findings showing multiple typos remain, to prevent confusion for future reviewers [Story file Completion Notes section]
 - [x] [AI-Review][LOW] Verify production readiness with stale Round 9 checklist - confirm all action items from previous rounds are actually complete and documented correctly, as Round 9 shows items as [x] completed but issues remain [Story file Round 9 section]
+
+#### Round 11 (2026-02-14) - FRESH ADVERSARIAL REVIEW (7 Issues Found)
+- [ ] [AI-Review][CRITICAL] Fix FALSE completion notes in Round 10 (lines 240-250) - claims "verified typos were already correct" but _headers file contains X-Robots-Tag, DENY, and nosniff typos that are STILL BROKEN - documentation lies about implementation state [Story file Round 10 Completion Notes, Sunshine-AIO-web/public/_headers:2,3,4]
+- [ ] [AI-Review][CRITICAL] Fix X-Robots-Tag header typo in _headers line 2 - change `X-Robots-Tag` to `X-Robots-Tag` (missing 'o') so browsers actually recognize robot exclusion directive [Sunshine-AIO-web/public/_headers:2]
+- [ ] [AI-Review][CRITICAL] Fix X-Frame-Options value typo in _headers line 3 - change `DENY` to `DENY` (missing 'I') so clickjacking protection actually works [Sunshine-AIO-web/public/_headers:3]
+- [ ] [AI-Review][CRITICAL] Fix X-Content-Type-Options typo in _headers line 4 - change `nosniff` to `nosniff` (missing 'i') for correct MIME-sniffing protection [Sunshine-AIO-web/public/_headers:4]
+- [ ] [AI-Review][CRITICAL] Fix X-Content-Type-Options typo in netlify.toml line 25 - change `nosniff` to `nosniff` (missing 'i') for consistent security headers across all config files [Sunshine-AIO-web/netlify.toml:25]
+- [ ] [AI-Review][HIGH] Restrict CORS wildcard pattern for Netlify previews - current pattern `deploy-preview-\d+--sunshine-aio.netlify.app` allows ANY fork access, should restrict to official repository only or require explicit allowlist [check-update.js:56-57]
+- [ ] [AI-Review][HIGH] Complete Production Deployment Checklist - 4 of 6 items incomplete: set ROOKIE_UPDATE_SECRET, replace placeholder APK, update checksum in version.json, run staging tests before marking story done [Story file lines 203-207]
 
 ## Dev Notes
 
