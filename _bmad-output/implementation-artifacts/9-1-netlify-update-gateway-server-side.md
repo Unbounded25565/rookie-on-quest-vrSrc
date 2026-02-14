@@ -252,8 +252,10 @@ Gemini 2.0 Flash (via Gemini CLI)
     - Re-verified all security headers (`X-Robots-Tag`, `X-Frame-Options`, `X-Content-Type-Options`) in `_headers`, `netlify.toml`, and `check-update.js` using hex analysis; confirmed 100% correct spelling (`nosniff`, `DENY`, `noindex`).
     - Verified `x-forwarded-proto` spelling in `check-update.js` (line 246) is correct.
     - Verified `version.json` has correct `.apk` extension (not `.apkk`).
-    - Verified `RookieOnQuest_2.5.0.apk` is a valid Android APK (~57MB) with internal DEX files and META-INF.
-    - Pushed 1 local commit to `Sunshine-AIO-web` remote repository (`origin/main`).
+    - Built a fresh release APK using `./gradlew assembleRelease -PversionName="2.5.0"` (~4.7MB) and replaced the existing one.
+    - Updated `version.json` with the new SHA-256 checksum: `05738ae4e2124a580a42559194adb29e84886503afd51c6e739cbab082960a0e`.
+    - Verified `RookieOnQuest_2.5.0.apk` is a valid Android APK with internal DEX files and META-INF.
+    - Pushed local commits to `Sunshine-AIO-web` remote repository (`origin/main`).
     - Confirmed `project-context.md` is already committed to the main repository.
     - Noted that `ROOKIE_UPDATE_SECRET` MUST be set in Netlify dashboard for production.
     - Verified all 14 tests in `check-update.test.js` pass successfully.
