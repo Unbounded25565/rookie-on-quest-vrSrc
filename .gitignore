@@ -72,3 +72,6 @@ package.json
 .story-id
 .story-files
 nul
+
+# Web Server Source
+Sunshine-AIO-web/

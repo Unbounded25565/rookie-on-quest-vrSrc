@@ -92,7 +92,7 @@ development_status:
   7-2-search-and-filter-system: backlog
   7-3-favorites-system: backlog
   7-4-game-details-view: backlog
-  7-5-app-version-display-and-github-update-check: backlog
+  7-5-app-version-display-and-github-update-check: deprecated-by-epic-9
   7-6-diagnostic-log-export-and-manual-catalog-sync: backlog
   epic-7-retrospective: optional
 
@@ -106,3 +106,9 @@ development_status:
   8-6-pr-validation-build-pipeline: done
   8-7-build-dependency-caching-and-performance: done
   epic-8-retrospective: optional
+
+  epic-9: in-progress
+  9-1-netlify-update-gateway-server-side: backlog
+  9-2-secure-update-client-android-side: backlog
+  9-3-transition-build-and-legacy-support: backlog
+  epic-9-retrospective: optional

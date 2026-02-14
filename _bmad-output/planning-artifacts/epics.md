@@ -337,6 +337,10 @@ This document provides the complete epic and story breakdown for rookie-on-quest
 - FR72: System can cache build dependencies for faster builds
 - FR73: System can run automated tests before creating release (if tests exist)
 
+**Epic 9: Secure Private Distribution System**
+- FR60: System can check secure gateway for app updates on startup
+- Migration from GitHub Releases to Netlify (Sunshine-AIO) Gateway
+
 ## Epic List
 
 ### Epic 1: Persistent Installation Queue System
@@ -438,6 +442,17 @@ Developers can create reliable, automated release builds with proper signing, ch
 - PR validation builds with status feedback
 - Build dependency caching for faster builds
 - Support for release candidates (RC builds)
+
+### Epic 9: Secure Private Distribution System
+Following the transition to private repository, this epic focuses on migrating the update mechanism to a secure private gateway on Netlify.
+
+**FRs covered:** FR60 (modified)
+
+**Key Deliverables:**
+- Secure Netlify Function for update metadata
+- HMAC-SHA256 signature validation
+- Secure APK distribution via Sunshine-AIO server
+- Bridge version for legacy user migration
 
 ## Epic 1: Persistent Installation Queue System
 
@@ -1262,3 +1277,42 @@ So that CI/CD builds complete quickly and save GitHub Actions minutes.
 **And** workflow supports parallel execution of code quality and test validation tasks (NFR-B3)
 **And** workflow completes full release build within 10 minutes (NFR-B1)
 **And** cache restoration and save steps are visible in workflow logs
+
+## Epic 9: Secure Private Distribution System
+
+Following the repository's transition to private status, the standard GitHub release mechanism is no longer accessible to unauthenticated clients. To maintain seamless updates for existing users without exposing the source code or APKs publicly, we are migrating to a custom, secured distribution gateway hosted on Netlify (Sunshine-AIO).
+
+### Story 9.1: Netlify Update Gateway (Server-side)
+
+**As a** developer,
+**I want to** implement a secure Netlify function on the Sunshine-AIO server,
+**So that** I can serve update metadata and APK download links only to authorized application instances.
+
+**Acceptance Criteria:**
+- [ ] Create a Netlify function \/api/check-update\.
+- [ ] Function validates an app-specific security header (e.g., \X-Rookie-Signature\).
+- [ ] Metadata includes version tag, changelog, and an obfuscated/encrypted download URL.
+- [ ] APK files are stored in a non-indexed directory or served via a secure stream.
+
+### Story 9.2: Secure Update Client (Android-side)
+
+**As a** user,
+**I want** my app to check for updates via the new secure gateway,
+**So that** I can stay up to date even though the GitHub repo is private.
+
+**Acceptance Criteria:**
+- [ ] Refactor \GitHubService.kt\ to \UpdateService.kt\ pointing to \sunshine-aio.com\.
+- [ ] Implement request signing logic in the app to authenticate with the gateway.
+- [ ] Implement decryption logic if the APK or metadata is served encrypted.
+- [ ] Maintain graceful fallback if the update server is unreachable.
+
+### Story 9.3: Transition Build & Legacy Support
+
+**As a** developer,
+**I want to** release a final \"bridge\" version,
+**So that** current users can migrate from the broken GitHub update path to the new secure gateway.
+
+**Acceptance Criteria:**
+- [ ] Create a specific build pointing to the new Netlify gateway.
+- [ ] Provide clear instructions for users to manually install this one-time \"bridge\" update.
+- [ ] Verify the bridge version correctly detects future updates from the gateway.
