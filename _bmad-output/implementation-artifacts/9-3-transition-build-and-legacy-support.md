@@ -1,6 +1,6 @@
 # Story 9.3: Transition Build & Legacy Support
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
