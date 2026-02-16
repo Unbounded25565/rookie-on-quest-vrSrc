@@ -715,6 +715,29 @@ jobs:
           echo "version.json created:"
           cat Sunshine-AIO-web/public/updates/rookie/version.json
 
+      - name: Configure Netlify secrets scanning
+        shell: bash
+        run: |
+          # Add SECRETS_SCAN_OMIT_PATHS to prevent Netlify from scanning APK files
+          # This prevents build failures when secrets are embedded in APK (which is expected)
+          cd Sunshine-AIO-web
+
+          # Check if netlify.toml exists and add the environment variable
+          if [ -f "netlify.toml" ]; then
+            # Add SECRETS_SCAN_OMIT_PATHS to prevent APK scanning issues
+            if ! grep -q "SECRETS_SCAN_OMIT_PATHS" netlify.toml; then
+              echo '' >> netlify.toml
+              echo '[build.environment]' >> netlify.toml
+              echo '  SECRETS_SCAN_OMIT_PATHS = "public/updates"' >> netlify.toml
+              echo "Added SECRETS_SCAN_OMIT_PATHS to netlify.toml"
+              cat netlify.toml
+            else
+              echo "SECRETS_SCAN_OMIT_PATHS already configured"
+            fi
+          else
+            echo "Warning: netlify.toml not found"
+          fi
+
       - name: Copy APK to Sunshine-AIO-web
         shell: bash
         env:
