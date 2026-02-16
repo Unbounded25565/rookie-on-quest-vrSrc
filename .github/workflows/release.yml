@@ -724,11 +724,10 @@ jobs:
 
           # Check if netlify.toml exists and add the environment variable
           if [ -f "netlify.toml" ]; then
-            # Add SECRETS_SCAN_OMIT_PATHS to prevent APK scanning issues
+            # Add SECRETS_SCAN_OMIT_PATHS to existing [build.environment] section
             if ! grep -q "SECRETS_SCAN_OMIT_PATHS" netlify.toml; then
-              echo '' >> netlify.toml
-              echo '[build.environment]' >> netlify.toml
-              echo '  SECRETS_SCAN_OMIT_PATHS = "public/updates"' >> netlify.toml
+              # Use sed to add the variable to the existing [build.environment] section
+              sed -i '/^\[build\.environment\]/a\  SECRETS_SCAN_OMIT_PATHS = "public/updates"' netlify.toml
               echo "Added SECRETS_SCAN_OMIT_PATHS to netlify.toml"
               cat netlify.toml
             else
