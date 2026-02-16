@@ -49,15 +49,22 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+  statuses: write
 
 jobs:
   build:
     name: Build Release APK
     runs-on: ubuntu-latest
     # NFR-B1: CI/CD workflow must complete release build within 10 minutes (soft target).
-    # Hard timeout set to 15 minutes to provide sufficient headroom for infrastructure 
+    # Hard timeout set to 15 minutes to provide sufficient headroom for infrastructure
     # variations while performance monitoring ensures the 10-minute SLA is respected.
     timeout-minutes: 15
+    permissions:
+      contents: write
+      attestations: write
+      checks: write
 
     steps:
       - name: Checkout code
