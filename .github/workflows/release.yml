@@ -742,10 +742,16 @@ jobs:
         env:
           VERSION: ${{ needs.build.outputs.version }}
         run: |
-          # Copy APK with version in filename
-          cp "apk/RookieOnQuest-v${VERSION}.apk" "Sunshine-AIO-web/public/updates/rookie/RookieOnQuest_${VERSION}.apk"
+          cd Sunshine-AIO-web/public/updates/rookie/
+
+          # Remove old APK files (keep only version.json and .gitkeep)
+          rm -f RookieOnQuest_*.apk
+          echo "Cleaned up old APK files"
+
+          # Copy new APK
+          cp "../../../../apk/RookieOnQuest-v${VERSION}.apk" "RookieOnQuest_${VERSION}.apk"
           echo "APK copied to Sunshine-AIO-web"
-          ls -la Sunshine-AIO-web/public/updates/rookie/
+          ls -la
 
       - name: Commit and Push to Sunshine-AIO-web
         shell: bash
