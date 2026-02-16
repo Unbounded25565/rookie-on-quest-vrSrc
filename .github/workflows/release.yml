@@ -701,11 +701,12 @@ jobs:
 
           mkdir -p Sunshine-AIO-web/public/updates/rookie
 
+          # Use underscore format to match the copied APK filename
           cat > Sunshine-AIO-web/public/updates/rookie/version.json << EOF
           {
               "version": "$VERSION",
               "changelog": "Release $VERSION - See GitHub release for details",
-              "downloadUrl": "/updates/rookie/$APK_FILE",
+              "downloadUrl": "/updates/rookie/RookieOnQuest_${VERSION}.apk",
               "checksum": "$CHECKSUM",
               "timestamp": "$TIMESTAMP"
           }
