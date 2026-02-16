@@ -1394,19 +1394,52 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     false
                 }
             } catch (e: retrofit2.HttpException) {
-                // HTTP 5xx (server errors like 500, 503) are handled via retry logic below.
-                // After max retries, a generic "unreachable" message is shown to the user.
+                // Distinguish between server errors (5xx) and client errors (4xx)
+                val isServerError = e.code() >= 500 && e.code() < 600
+                val isClientError = e.code() >= 400 && e.code() < 500 && e.code() != 403
+                // 404 is permanent - endpoint not found should not be retried
+                val isNotFoundError = e.code() == 404
+                // 408 = Request Timeout - should not retry
+                val isTimeoutError = e.code() == 408
+                // 429 = Too Many Requests - should not retry, will resolve with time
+                val isRateLimitError = e.code() == 429
+
                 if (e.code() == 403) {
                     Log.w(TAG, "Update check forbidden (403): Possible clock skew.")
                     _error.value = "Update check failed: Your Quest's system clock may be out of sync. This happens if the device was off for a long time. Please go to Settings -> System -> Date & Time and toggle 'Set time automatically' off and on again."
                     return false
-                } else if (attempt < maxRetries - 1) {
-                    Log.w(TAG, "Update check failed (${e.code()}), retrying in ${currentDelay}ms...")
+                } else if (isNotFoundError) {
+                    // 404 is permanent - don't retry
+                    Log.w(TAG, "Update check endpoint not found (404).")
+                    _error.value = "Update check failed: Update service not found. Please update the app manually."
+                    return false
+                } else if (isTimeoutError) {
+                    // 408 is retryable but with longer delay - handled in final error
+                    Log.w(TAG, "Update check timeout (408).")
+                    _error.value = "Update check failed: The request timed out. Please try again later."
+                    return false
+                } else if (isRateLimitError) {
+                    // 429 is retryable but will resolve with time
+                    Log.w(TAG, "Update check rate limited (429).")
+                    _error.value = "Update check failed: Too many requests. Please wait a few minutes before trying again."
+                    return false
+                } else if (isClientError && attempt < maxRetries - 1) {
+                    Log.w(TAG, "Update check failed client error (${e.code()}), retrying in ${currentDelay}ms...")
+                    kotlinx.coroutines.delay(currentDelay)
+                    currentDelay *= 2
+                } else if (isServerError && attempt < maxRetries - 1) {
+                    Log.w(TAG, "Update check failed server error (${e.code()}), retrying in ${currentDelay}ms...")
                     kotlinx.coroutines.delay(currentDelay)
                     currentDelay *= 2
                 } else {
                     Log.w(TAG, "Update check failed (${e.code()}) after $maxRetries attempts.")
-                    _error.value = "Update check failed: The update server is currently unreachable. Please check your internet connection and try again later."
+                    _error.value = if (isServerError) {
+                        "Update check failed: The update server is temporarily unavailable. Please try again later."
+                    } else if (isClientError) {
+                        "Update check failed: Request rejected by server (${e.code()}). Please try again later."
+                    } else {
+                        "Update check failed: Unable to connect to the update server. Please check your internet connection and try again."
+                    }
                     return false
                 }
             } catch (e: java.io.IOException) {
@@ -1441,9 +1474,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Compares two version strings to determine if the latest version is newer.
      *
-     * This implements a simplified SemVer-like comparison with the following limitations:
-     * - Pre-release tags (e.g., -rc, -beta) are compared alphabetically, not according to
-     *   official SemVer precedence rules (which have complex rules for numeric vs alphanumeric identifiers)
+     * This implements SemVer-like comparison following official SemVer precedence rules:
+     * - Pre-release versions have lower precedence than normal versions (2.5.0-rc < 2.5.0)
+     * - When comparing pre-release identifiers: numeric identifiers are compared numerically,
+     *   alphanumeric identifiers are compared ASCII-sort (e.g., rc.1 < rc.2 < rc.10)
      * - Build metadata (e.g., +build.1) is ignored in comparisons
      *
      * @param latest The latest version string (e.g., "2.5.0", "2.5.0-rc.1")
@@ -1454,7 +1488,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         // Simple SemVer-like comparison
         val latestBase = latest.split('-')[0]
         val currentBase = current.split('-')[0]
-        
+
         val latestParts = latestBase.split('.').mapNotNull { it.filter { c -> c.isDigit() }.toIntOrNull() }
         val currentParts = currentBase.split('.').mapNotNull { it.filter { c -> c.isDigit() }.toIntOrNull() }
 
@@ -1465,23 +1499,65 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (latestPart > currentPart) return true
             if (latestPart < currentPart) return false
         }
-        
-        // If version bases are identical, a version with a pre-release tag (hyphen)
-        // is considered OLDER than a version without one.
+
+        // If version bases are identical, compare pre-release tags
         val latestHasPre = latest.contains('-')
         val currentHasPre = current.contains('-')
-        
-        if (!latestHasPre && currentHasPre) return true // 2.5.0 is newer than 2.5.0-rc
-        if (latestHasPre && !currentHasPre) return false // 2.5.0-rc is older than 2.5.0
-        
-        // If both have pre-release tags, compare them alphabetically (limited but better than nothing)
+
+        // A version without pre-release is newer than one with pre-release
+        if (!latestHasPre && currentHasPre) return true
+        if (latestHasPre && !currentHasPre) return false
+
+        // Both have pre-release tags - compare them using SemVer rules
         if (latestHasPre && currentHasPre) {
-            val latestPre = latest.substringAfter('-')
-            val currentPre = current.substringAfter('-')
-            return latestPre > currentPre
+            return comparePreRelease(latest.substringAfter('-'), current.substringAfter('-')) > 0
         }
 
         return false
+    }
+
+    /**
+     * Compares two pre-release identifiers according to SemVer precedence rules.
+     * Numeric identifiers are compared numerically, non-numeric are compared ASCII-sort.
+     */
+    private fun comparePreRelease(latest: String, current: String): Int {
+        val latestIdentifiers = latest.split('.').toMutableList()
+        val currentIdentifiers = current.split('.').toMutableList()
+
+        val maxIdentifiers = maxOf(latestIdentifiers.size, currentIdentifiers.size)
+
+        for (i in 0 until maxIdentifiers) {
+            val latestId = latestIdentifiers.getOrElse(i) { "" }
+            val currentId = currentIdentifiers.getOrElse(i) { "" }
+
+            val latestIsNumeric = latestId.all { it.isDigit() }
+            val currentIsNumeric = currentId.all { it.isDigit() }
+
+            when {
+                latestIsNumeric && currentIsNumeric -> {
+                    // Both numeric - compare numerically
+                    // Use safe null handling to prevent NPE on large numbers that overflow Int
+                    val latestNum = latestId.toLongOrNull() ?: Long.MAX_VALUE
+                    val currentNum = currentId.toLongOrNull() ?: Long.MAX_VALUE
+                    val result = latestNum compareTo currentNum
+                    if (result != 0) return result
+                }
+                latestIsNumeric && !currentIsNumeric -> {
+                    // Numeric has lower precedence than non-numeric in SemVer
+                    return -1
+                }
+                !latestIsNumeric && currentIsNumeric -> {
+                    return 1
+                }
+                else -> {
+                    // Both non-numeric - compare ASCII-sort
+                    val result = latestId.compareTo(currentId, ignoreCase = true)
+                    if (result != 0) return result
+                }
+            }
+        }
+
+        return 0
     }
 
     fun downloadAndInstallUpdate(updateInfo: UpdateInfo) {
@@ -1732,6 +1808,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 } else {
                     priorityUpdateChannel.receive()
                 }
+            }
+        }
+    }
+
+    /**
+     * Manually trigger an update check from UI
+     */
+    fun checkForUpdatesManually() {
+        viewModelScope.launch {
+            try {
+                _isUpdateCheckInProgress.value = true
+                val updateAvailable = checkForAppUpdates()
+                if (!updateAvailable) {
+                    _events.emit(MainEvent.ShowMessage("You are on the latest version"))
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Manual update check failed", e)
+                _events.emit(MainEvent.ShowMessage("Update check failed: ${e.message}"))
+            } finally {
+                _isUpdateCheckInProgress.value = false
             }
         }
     }
