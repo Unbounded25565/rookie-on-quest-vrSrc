@@ -1,6 +1,6 @@
 # Story 9.4: Automated APK Deployment to Netlify
 
-Status: in-progress
+Status: review
 
 ## Story
 
@@ -17,7 +17,7 @@ so that users receive updates without manual file copying.
 5. [x] Add step to copy new APK to `Sunshine-AIO-web/public/updates/rookie/`.
 6. [x] Add step to update `Sunshine-AIO-web/public/updates/rookie/version.json` with new version, changelog, and checksum.
 7. [x] Add step to commit and push changes to `Sunshine-AIO-web` main branch.
-8. [ ] Verify Netlify auto-deploy triggers after push.
+8. [x] Verify Netlify auto-deploy triggers after push.
 9. [x] Add documentation for the deployment process.
 
 ## Tasks / Subtasks
@@ -33,18 +33,18 @@ so that users receive updates without manual file copying.
   - [x] Add new job or step in release.yml for Netlify deployment
   - [x] Configure GitHub token with permission to push to Sunshine-AIO-web
   - [x] Add error handling and rollback capability
-- [ ] Task 4: Testing & Validation
-  - [ ] Test deployment with a test release (e.g., 2.5.1-rc.1)
-  - [ ] Verify APK is accessible at Netlify URL
-  - [ ] Verify version.json is correct
-  - [ ] Verify update check works from app
+- [x] Task 4: Testing & Validation
+  - [x] Test deployment with a test release (e.g., 2.5.1-rc.1) - Tested with 2.4.1-build
+  - [x] Verify APK is accessible at Netlify URL
+  - [x] Verify version.json is correct
+  - [x] Verify update check works from app
 
 ## Review Follow-ups (AI)
 
 ### CRITICAL Issues
 
 - [x] [AI-Review][CRITICAL] Commit scripts/deploy-to-netlify.sh to git - File is currently untracked
-- [ ] [AI-Review][CRITICAL] Implement AC8 verification - Test Netlify auto-deploy actually triggers after push
+- [x] [AI-Review][CRITICAL] Implement AC8 verification - Test Netlify auto-deploy actually triggers after push
 - [x] [AI-Review][CRITICAL] Add tests for deploy-to-netlify.sh script - Create unit/integration tests
 
 ### MEDIUM Issues
@@ -221,6 +221,7 @@ N/A - Story implementation completed without issues
 ### Review Follow-up Completion (Session 2026-02-16)
 
 - ✅ Resolved [CRITICAL]: Committed `scripts/deploy-to-netlify.sh` to git
+- ✅ Resolved [CRITICAL]: AC8 verification - Tested with release 2.4.1-build, Netlify auto-deploy confirmed working
 - ✅ Resolved [CRITICAL]: Added tests for deploy-to-netlify.sh (13 tests passing)
 - ✅ Resolved [MEDIUM]: Added rollback mechanism on push failure
 - ✅ Resolved [MEDIUM]: Documented GH_PAT_SUNSHINE_AIO secret creation with step-by-step guide
@@ -228,10 +229,7 @@ N/A - Story implementation completed without issues
 - ✅ Resolved [MEDIUM]: Removed automatic netlify.toml modification (risky)
 - ✅ Resolved [LOW]: Added version.json validation (JSON parse + required fields check)
 - ✅ Resolved [LOW]: deploy-to-netlify.sh is now committed and usable for local deployments
-
-**Still Pending:**
-- AC8 verification (requires actual deployment test)
-- Comprehensive E2E test (requires actual deployment)
+- ✅ Resolved: Fixed check-update function to read from public/updates/rookie/version.json instead of netlify/functions/version.json
 
 ### Code Review Notes (AI Review - 2026-02-16)
 
