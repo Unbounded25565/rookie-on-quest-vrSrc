@@ -112,6 +112,124 @@ Visit [Releases Page](https://github.com/LeGeRyChEeSe/rookie-on-quest/releases) 
 
 ---
 
+## Netlify Update Gateway Deployment
+
+**Story:** 9.4 - Automated APK Deployment to Netlify
+
+Since the repository moved to private status, APK distribution migrated to a custom Netlify-hosted gateway (Sunshine-AIO-web) for secure updates.
+
+### Deployment Flow
+
+The release workflow now automatically deploys to both GitHub Releases AND Netlify:
+
+```
+GitHub Actions Release Workflow
+    │
+    ├── Build Release APK
+    ├── Create GitHub Release ← Standard distribution
+    │
+    └── Deploy to Netlify (NEW in Story 9.4)
+          │
+          ├── Download APK artifact
+          ├── Calculate SHA-256 checksum
+          ├── Clone Sunshine-AIO-web
+          ├── Copy APK to public/updates/rookie/
+          ├── Update version.json
+          └── Push → Netlify Auto-Deploy
+```
+
+### Netlify Gateway Structure
+
+**Repository:** `LeGeRyChEeSe/Sunshine-AIO-web`
+
+| Path | Description |
+|------|-------------|
+| `public/updates/rookie/RookieOnQuest_{version}.apk` | APK file |
+| `public/updates/rookie/version.json` | Version metadata |
+
+### version.json Format
+
+```json
+{
+    "version": "2.5.0",
+    "changelog": "Release 2.5.0 - See GitHub release for details",
+    "downloadUrl": "/updates/rookie/RookieOnQuest_2.5.0.apk",
+    "checksum": "sha256-hash-of-apk",
+    "timestamp": "2026-02-16T12:00:00Z"
+}
+```
+
+### Required GitHub Secrets
+
+| Secret Name | Description | Required For |
+|-------------|-------------|--------------|
+| `GH_PAT_SUNSHINE_AIO` | Personal Access Token with `repo` scope for Sunshine-AIO-web | Netlify deployment |
+| `ROOKIE_UPDATE_SECRET` | HMAC signing key for update requests | Release builds |
+
+### Creating GH_PAT_SUNSHINE_AIO Secret
+
+To enable automatic deployment to Sunshine-AIO-web, create a Personal Access Token (PAT):
+
+1. **Go to GitHub Settings:**
+   - Visit https://github.com/settings/tokens
+   - Click "Generate new token (classic)"
+
+2. **Configure Token:**
+   - **Note:** `RookieOnQuest Netlify Deployment`
+   - **Expiration:** Select appropriate expiration (recommend 90 days or 1 year)
+   - **Scopes:** Select `repo` (full control of private repositories)
+
+3. **Copy the Token:**
+   - Copy the generated token immediately (it won't be shown again)
+
+4. **Add to Repository Secrets:**
+   - Go to: https://github.com/LeGeRyChEeSe/rookie-on-quest/settings/secrets/actions
+   - Click "New repository secret"
+   - Name: `GH_PAT_SUNSHINE_AIO`
+   - Value: Paste your token
+   - Click "Add secret"
+
+**Note:** The token needs write access to the Sunshine-AIO-web repository. Make sure the token's account has appropriate permissions.
+
+### Manual Netlify Deployment
+
+If CI/CD fails, deploy manually:
+
+```bash
+# 1. Clone Sunshine-AIO-web
+git clone https://github.com/LeGeRyChEeSe/Sunshine-AIO-web.git
+cd Sunshine-AIO-web
+
+# 2. Copy APK
+cp path/to/RookieOnQuest-v2.5.0.apk public/updates/rookie/RookieOnQuest_2.5.0.apk
+
+# 3. Calculate checksum
+sha256sum public/updates/rookie/RookieOnQuest_2.5.0.apk
+
+# 4. Update version.json
+# Edit public/updates/rookie/version.json with new version, checksum, timestamp
+
+# 5. Commit and push
+git add public/updates/rookie/
+git commit -m "Deploy RookieOnQuest v2.5.0"
+git push origin main
+
+# Netlify auto-deploys after push
+```
+
+### Verify Netlify Deployment
+
+1. Check Sunshine-AIO-web GitHub commit pushed successfully
+2. Visit Netlify dashboard → Deploys → Verify "Deploy started" triggered
+3. Wait for "Deploy published" status
+4. Test update check from Quest app
+
+### Netlify URL
+
+The update gateway is accessible at: **https://sunshine-aio.com** (or configured custom domain)
+
+---
+
 ## GitHub Secrets Configuration
 
 **Required Secrets (Repository Settings > Secrets and Variables > Actions):**
@@ -329,6 +447,7 @@ Installation triggered via Android's `PackageInstaller`.
 |---------|---------|-------------|-------|
 | GitHub Actions | CI/CD | High | GitHub |
 | GitHub Releases | APK hosting | High | GitHub |
+| Netlify (Sunshine-AIO) | Secure update gateway | **Critical** | VRPirates Team |
 | VRPirates Servers | Game catalog/downloads | **Critical** | VRPirates Team |
 | GitHub API | Update checks | Medium | GitHub |
 
