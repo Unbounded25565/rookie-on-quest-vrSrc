@@ -274,7 +274,7 @@ jobs:
         # Using ./gradlew clean ensures deterministic builds and handles module-specific
         # outputs correctly. Executable permissions for gradlew are managed by the
         # gradle-cache composite action.
-        timeout-minutes: 2
+        timeout-minutes: 5
         shell: bash
         run: |
           echo "Cleaning build directory..."
