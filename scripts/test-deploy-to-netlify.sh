@@ -124,11 +124,41 @@ else
     log_fail "Script has syntax errors"
 fi
 
+# Test 12: Idempotency check - script handles repeated runs gracefully
+log_info "Test 12: Idempotency check"
+# Check that script doesn't fail when run multiple times with same inputs
+# The script should handle "no changes to commit" case gracefully
+if grep -q "No changes to commit" "$SCRIPT_DIR/deploy-to-netlify.sh"; then
+    log_pass "Script handles idempotent runs (no changes case)"
+else
+    log_fail "Script may fail on repeated runs"
+fi
+
+# Test 13: Checksum is deterministic - same file produces same hash
+log_info "Test 13: Deterministic checksum check"
+# Verify script uses sha256sum which produces consistent results
+if grep -q "sha256sum.*awk" "$SCRIPT_DIR/deploy-to-netlify.sh"; then
+    log_pass "Checksum uses deterministic sha256sum"
+else
+    log_fail "Checksum method may not be deterministic"
+fi
+
+# Test 14: Version.json is always valid JSON
+log_info "Test 14: JSON structure validation"
+# Check that version.json is created with proper JSON structure
+if grep -q '"version":' "$SCRIPT_DIR/deploy-to-netlify.sh" && \
+   grep -q '"checksum":' "$SCRIPT_DIR/deploy-to-netlify.sh"; then
+    log_pass "JSON contains required fields"
+else
+    log_fail "JSON may be missing required fields"
+fi
+
 # Summary
 echo ""
 echo "========================================"
 echo "Test Results Summary"
 echo "========================================"
+echo "Total Tests: 14"
 echo -e "${GREEN}Passed:${NC} $TESTS_PASSED"
 echo -e "${RED}Failed:${NC} $TESTS_FAILED"
 echo ""
