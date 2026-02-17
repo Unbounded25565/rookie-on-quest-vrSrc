@@ -117,4 +117,4 @@ development_status:
   9-2-secure-update-client-android-side: done
   9-3-transition-build-and-legacy-support: done
   9-4-automated-apk-deployment-to-netlify: done
-  epic-9-retrospective: optional
+  epic-9-retrospective: done
