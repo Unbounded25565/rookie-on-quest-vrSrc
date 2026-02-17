@@ -1,6 +1,6 @@
 # Story 9.4: Automated APK Deployment to Netlify
 
-Status: review
+Status: done
 
 ## Story
 
