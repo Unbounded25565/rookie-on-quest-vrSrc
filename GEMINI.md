@@ -1,17 +1,17 @@
-# Rookie On Quest - Project Context
+# 🛑 PROJECT CEASED / ARCHIVED - Rookie On Quest
 
 ## Project Overview
-**Rookie On Quest** is a native Android application designed for Meta Quest headsets. It serves as a standalone client for the VRPirates "Rookie Sideloader" ecosystem, allowing users to browse, download, and install VR games (APK + OBB) directly on the device without a PC.
+**Rookie On Quest** was a native Android application designed for Meta Quest headsets. It functioned as a standalone client for the VRPirates "Rookie Sideloader" ecosystem.
 
-## Tech Stack & Architecture
+**STATUS: DISCONTINUED (March 19, 2026)**
+The project is non-functional following the permanent shutdown of VRPirates infrastructure.
+
+## Tech Stack & Architecture (Historical)
 *   **Language:** Kotlin
 *   **UI Framework:** Jetpack Compose (Material 3)
 *   **Architecture:** MVVM (Model-View-ViewModel)
-*   **Dependency Injection:** Manual / Service Locator pattern (implied, no Hilt/Dagger seen in build.gradle yet).
 *   **Networking:** Retrofit 2 + Gson
 *   **Local Storage:** Room Database
-*   **Image Loading:** Coil
-*   **Async/Concurrency:** Kotlin Coroutines & Flow
 *   **Compression:** Apache Commons Compress + XZ (for 7z archive handling)
 *   **Minimum SDK:** 29 (Android 10)
 *   **Target SDK:** 34 (Android 14)
@@ -22,42 +22,16 @@
     *   `logic/`: Business logic (e.g., `CatalogParser`).
     *   `network/`: Network services (`GitHubService`, `VrpService`).
     *   `ui/`: Jetpack Compose UI components (`MainActivity`, `MainViewModel`, `GameListItem`).
-*   `app/src/main/res/`: Resources (drawables, strings, themes).
-*   `rookie/`: Likely a submodule or reference to the original C# Desktop Rookie Sideloader (contains `.NET` style folders like `Properties`, `Sideloader`).
 
-## Build & Run
-### Commands
-*   **Build Debug APK:** `./gradlew assembleDebug`
-*   **Build Release APK:** `./gradlew assembleRelease`
-*   **Install Debug:** `./gradlew installDebug`
+## Final Build & Development Info
+*   **Final Stable Version:** 3.0.0
+*   **Repository Status:** Archived. No further development or maintenance will occur.
 
-### Installation
-The app is typically installed via SideQuest or ADB.
-*   **ADB:** `adb install RookieOnQuest.apk`
+## Notes (Legacy)
+*   **Infrastructure Dependency:** The application relied entirely on VRPirates infrastructure for game catalogs and downloads. This dependency was its single point of failure.
+*   **Core Implementation:** Successfully implemented a standalone download and extraction pipeline for large 7z archives on Android Quest devices.
 
-## Development Status & Roadmap
-*   **Current Version:** 2.1.1
-*   **Recent Features:** Extraction state management, Pre-flight storage checks, Unified progress UI.
-*   **Immediate Priorities (from ACTION_PLAN.md):**
-    *   Shizuku Integration (for silent/background installs).
-    *   Background WorkManager (for download queues).
-    *   Clean Title Parsing.
-
-## Coding Conventions
-*   **Style:** Kotlin official style guide.
-*   **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, etc.).
-*   **UI:** 100% Jetpack Compose.
-*   **State Management:** ViewModels exposing `StateFlow` or Compose `State` to UI.
-
-## Notes
-*   **Infrastructure Dependency:** The application relies entirely on VRPirates infrastructure for game catalogs and downloads.
-*   **Complex File Operations:** It handles downloading large archives (often multi-GB), extracting 7z/zip formats, and correctly placing OBB files in Android's restricted storage directories.
-*   **Performance:** Optimized for handling large lists (2400+ items) using Jetpack Compose LazyLists.
-*   **Background Processes:** Includes logic to handle background downloads and initial icon extraction, which are critical for user experience on the Quest's aggressive battery management system.
-*   **Permissions:** Requires extensive storage permissions and relies on Developer Mode being enabled on the headset.
-
-## Agent Instructions
-*   **Internal Tools Priority:** Gemini must always prioritize using its built-in tools (`read_file`, `search_file_content`, `replace`, etc.) for any file manipulation or searching tasks.
-*   **Shell Usage:** PowerShell commands should only be used when no internal tool is suitable for the specific task.
-*   **Fallback:** As a last resort, if PowerShell is unavailable or inappropriate, use standard CMD commands.
-*   **Project Context:** Always refer to `README.md`, `ACTION_PLAN.md`, and `PROJECT_DASHBOARD.md` to maintain alignment with current project goals.
+## Agent Instructions (Archival Mode)
+*   **Status:** This project is archived. No modifications to functional code should be made.
+*   **Context:** Refer to the updated `README.md` for details on the VRPirates DMCA shutdown.
+*   **Inquiries:** If asked about the status, confirm that the project is dead because its backend servers were taken offline by Meta.

@@ -1,13 +1,22 @@
-# 📋 Technical Roadmap - Rookie On Quest
+# 🛑 PROJECT CEASED / END OF LIFE - ACTION PLAN CANCELLED
 
-This document outlines the strategic priorities for the project, categorized by impact and implementation urgency.
+**Rookie On Quest is officially discontinued as of March 19, 2026.**
+
+Following the recent DMCA takedown by Meta (March 17, 2026) and the subsequent complete cessation of **VR Pirates (VRP)** and the **Rookie Sideloader** ecosystem, this project is no longer functional. All future development, including planned features and epics, has been **cancelled**.
 
 ---
 
-## ✅ Completed Milestones
+# 📋 Technical Roadmap - Rookie On Quest (Historical)
+
+This document is preserved for historical reference only. All pending tasks have been abandoned.
+
+---
+
+## ✅ Completed Milestones (Final Status v3.0.0)
 
 | Milestone                      | Impact                                                                                  |
 |:-------------------------------|:----------------------------------------------------------------------------------------|
+| **Maintenance Release (v3.0.0)**| Stability and dependency updates prior to project cessation.                            |
 | **Install Queue & Manager**    | Implemented a robust background queue with pause/resume and task promotion.             |
 | **Rich Metadata System**       | Integrated game descriptions and screenshots into a new expandable UI.                  |
 | **File Management**            | Added ability to delete downloaded APKs and manage storage directly from the app.       |
@@ -31,40 +40,23 @@ This document outlines the strategic priorities for the project, categorized by 
 
 ---
 
-## 🔴 Priority 1: Critical Stability & Core Logic
-*Essential fixes and fundamental features required for a reliable experience.*
+## 🛑 CANCELLED PRIORITIES
 
-### 📦 Package Management
-- [ ] **Shizuku Integration:** Implement silent, background installation to remove manual ADB/FileProvider friction.
+The following tasks were in the pipeline but have been permanently abandoned:
 
----
+### 🔴 Priority 1: Package Management
+- [ ] **Shizuku Integration:** Silent, background installation.
 
-## 🟠 Priority 2: Workflow & Navigation
-*Enhancements to streamline user interaction and download efficiency.*
+### 🟠 Priority 2: Workflow & Navigation
+- [ ] **Background WorkManager:** Robust background persistence and scheduling.
+- [ ] **Foreground Service:** Active notification system.
+- [ ] **Clean Title Parsing:** Regex-based title cleaning.
 
-### 📥 Queue Management
-- [ ] **Background WorkManager:** Migrate the current queue to WorkManager for persistence across app restarts and OS-level scheduling.
-- [ ] **Foreground Service:** Active notification system to track and manage ongoing background operations.
-
-### 🔍 Discovery Tools
-- [ ] **Clean Title Parsing:** Regex-based cleaning to improve catalog readability (stripping prefixes and underscores).
-
----
-
-## 🟡 Priority 3: UI Polish & Extended Features
-*Aesthetic improvements and specialized tools for an immersive VR experience.*
-
-### 🖼️ Visual Experience
-- [ ] **Immersive Grid Layout:** High-density vertical grid featuring large game posters for HMD-optimized browsing.
-- [ ] **Skeleton UI:** Shimmer effects for a smoother perceived loading experience during database or image fetches.
-
-### 📝 Content Depth
-- [ ] **Data Management:** Integrated backup and restore functionality for `/Android/data/` save files.
+### 🟡 Priority 3: UI Polish & Extended Features
+- [ ] **Immersive Grid Layout:** Poster-based HMD UI.
+- [ ] **Skeleton UI:** Shimmer effects for loading states.
+- [ ] **Data Management:** Backup/Restore for `/Android/data/`.
 
 ---
 
-## 🔵 Priority 4: Infrastructure & Scalability
-*Long-term architectural health and remote support capabilities.*
-
-### 🏗️ Architecture
-- [ ] **Extensible Repositories:** Support for user-defined JSON catalog sources within settings.
+*Last updated: March 19, 2026*

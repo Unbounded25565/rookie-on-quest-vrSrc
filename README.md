@@ -1,84 +1,70 @@
+# 🛑 PROJECT CEASED / END OF LIFE
+
+**Rookie On Quest is officially discontinued.**
+
+Following the recent DMCA takedown by Meta (March 17, 2026) and the subsequent complete cessation of **VR Pirates (VRP)** and the **Rookie Sideloader** ecosystem, this project is no longer functional. Since Rookie On Quest was entirely dependent on VRP's servers and infrastructure to provide its catalog and downloads, the application can no longer fetch game lists or facilitate installations.
+
+**The servers are offline, and the project has been archived.**
+
+---
+
 # Rookie On Quest
 
 <p align="center">
   <img src="app/src/main/res/drawable/app_icon.png" width="256" alt="Rookie On Quest Icon">
   <br>
-  <img src="https://img.shields.io/github/v/release/LeGeRyChEeSe/rookie-on-quest?style=for-the-badge&color=orange" alt="Latest Release">
+  <img src="https://img.shields.io/badge/STATUS-ARCHIVED-red?style=for-the-badge" alt="Status Archived">
+  <img src="https://img.shields.io/badge/VERSION-3.0.0-orange?style=for-the-badge" alt="Latest Release">
   <img src="https://img.shields.io/github/stars/LeGeRyChEeSe/rookie-on-quest?style=for-the-badge&color=2ea44f" alt="Stars">
   <img src="https://img.shields.io/github/last-commit/LeGeRyChEeSe/rookie-on-quest?style=for-the-badge" alt="Last Commit">
-  <img src="https://img.shields.io/github/downloads/LeGeRyChEeSe/rookie-on-quest/total?style=for-the-badge&color=007ec6" alt="Downloads">
-  <img src="https://komarev.com/ghpvc/?username=LeGeRyChEeSe&repo=rookie-on-quest&style=for-the-badge&label=VIEWS&color=blue" alt="Views">
-  <br><br>
-  <a href="https://github.com/LeGeRyChEeSe/rookie-on-quest/releases/latest">
-    <img src="https://img.shields.io/badge/DOWNLOAD-LATEST_APK-orange?style=for-the-badge&logo=android&logoColor=white" alt="Download Latest APK">
-  </a>
 </p>
 
-A standalone Meta Quest application to browse, download, and install VR games natively. This project brings the power of the original Rookie Sideloader directly to your headset, eliminating the need for a PC during installation.
+A standalone Meta Quest application to browse, download, and install VR games natively. **This project is now obsolete.**
 
 ---
 
 ### Table of Contents
 - [Overview](#overview)
+- [The End of the Journey](#the-end-of-the-journey)
 - [Special Thanks](#special-thanks)
-- [Key Features](#key-features)
-- [Download & Installation](#download--installation)
-- [Build from Source](#build-from-source)
-- [Contributing](#contributing)
+- [Key Features (Legacy)](#key-features-legacy)
+- [Download & Installation (Legacy)](#download--installation-legacy)
 
 ---
 
 ## Overview
 
-**Rookie On Quest** is a standalone client for the Meta Quest, built natively with **Kotlin** and **Jetpack Compose**. It is important to note that this application is **entirely dependent on the servers and infrastructure maintained by the [Rookie](https://github.com/VRPirates/rookie)/VRPirates team**. It functions as a specialized interface for their services, and its operation relies completely on their continued work and server availability.
+**Rookie On Quest** was a standalone client for the Meta Quest, built natively with **Kotlin** and **Jetpack Compose**. It functioned as a specialized interface for the [Rookie](https://github.com/VRPirates/rookie)/VRPirates ecosystem. 
 
-> [!NOTE]
-> 📊 **Check out our [Project Dashboard](PROJECT_DASHBOARD.md)** and **[Roadmap](ROADMAP.md)** for a visual progress, current status, and simplified architecture diagrams.
+As stated since the project's inception, this application was **entirely dependent on the servers and infrastructure maintained by the VRPirates team**. With their infrastructure now permanently offline following legal action, this app has reached its end of life.
+
+## The End of the Journey
+
+On March 17, 2026, the VR Pirates team announced their complete and permanent shutdown following a DMCA request from Meta. This included the removal of all mirrors, the cessation of their cracking operations, and the disabling of the backend servers that Rookie On Quest relied upon.
+
+Without these servers, the app can no longer:
+- Fetch the game catalog.
+- Download APK or OBB files.
+- Provide update information.
+
+The repository remains here for educational purposes and as a testament to the work put into the Android implementation, but **no further updates will be provided and the app is non-functional.**
 
 ## Special Thanks
 
-A huge thank you to the **Rookie developers and the VRPirates community**. Their hard work in maintaining the servers, catalog, and the original [Rookie sideloader](https://github.com/VRPirates/rookie) ecosystem is what makes this project possible. This app is a tribute to their dedication to the VR community.
+A final and heartfelt thank you to the **Rookie developers and the VRPirates community**. Their years of dedication to the VR community made this project possible. We respect their decision to cease operations and thank them for the journey.
 
-### Key Features
-- **Standalone Sideloading**: Install games (APK + OBB) directly on your Meta Quest without needing a PC.
-- **Full Catalog Access**: Browse and search through the complete VRPirates library natively.
-- **Favorites System**: Mark your favorite games for quick access.
-- **Advanced Sorting**: Sort by name, size, date, or popularity to find the best games.
-- **Background Downloads**: Optimized to continue downloading even when the device sleeps.
-- **Optimized Performance**: Smooth and fast navigation through 2400+ game entries.
-- **Zero Setup**: Open the app and start browsing immediately with no configuration required.
-
-> [!TIP]
-> **Performance Note**: Upon the first launch or after an update, the application extracts icons in the background.
+### Key Features (Legacy)
+- **Standalone Sideloading**: (Disabled) Install games (APK + OBB) directly on your Meta Quest.
+- **Full Catalog Access**: (Disabled) Browse and search through the complete VRPirates library.
+- **Background Downloads**: (Disabled) Optimized to continue downloading even when the device sleeps.
+- **Optimized Performance**: Smooth navigation through 2400+ game entries.
 
 ---
 
-## Download & Installation
+## Download & Installation (Legacy)
 
-### 1. Download the App
-Get the latest version of **Rookie On Quest**:
-
-[![Download Latest APK](https://img.shields.io/badge/DOWNLOAD-LATEST_APK-orange?style=for-the-badge&logo=android&logoColor=white)](https://github.com/LeGeRyChEeSe/rookie-on-quest/releases/latest)
-
-### 2. Prepare your Quest
-Ensure your Meta Quest is in **Developer Mode**. If you haven't enabled it yet:
-1. Go to the [Meta Quest Developer Dashboard](https://dashboard.oculus.com/).
-2. Create an "Organization".
-3. Open the Meta Quest app on your phone, go to **Devices > Headset Settings > Developer Mode**, and toggle it on.
-
-### 3. Install the APK
-You can install the downloaded `.apk` file using one of the following methods:
-
-#### Method A: SideQuest (Recommended)
-1. Open **SideQuest** on your PC.
-2. Connect your Quest via USB.
-3. Drag and drop the `RookieOnQuest.apk` file into the SideQuest window.
-
-#### Method B: ADB (Command Line)
-If you have ADB installed, run:
-```bash
-adb install RookieOnQuest.apk
-```
+> [!WARNING]
+> **The application will no longer function.** The instructions below are kept for historical reference only.
 
 ---
 
