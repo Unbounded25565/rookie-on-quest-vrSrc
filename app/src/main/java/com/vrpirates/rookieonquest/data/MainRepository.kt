@@ -106,21 +106,20 @@ class MainRepository(
     }
 
     suspend fun fetchConfig(): PublicConfig = withContext(Dispatchers.IO) {
+        // Return hardcoded config instead of fetching from API
+        val config = PublicConfig(
+            baseUri = "https://go.srcdl1.xyz/",
+            password64 = "WjB3MU9WWm1aMUI0YjBoUw=="
+        )
+        cachedConfig = config
         try {
-            val config = service.getPublicConfig()
-            cachedConfig = config
-            try {
-                val decoded = Base64.decode(config.password64, Base64.DEFAULT)
-                decodedPassword = String(decoded, Charsets.UTF_8)
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to decode password64, using raw value: ${e.message}")
-                decodedPassword = config.password64
-            }
-            config
+            val decoded = Base64.decode(config.password64, Base64.DEFAULT)
+            decodedPassword = String(decoded, Charsets.UTF_8)
         } catch (e: Exception) {
-            Log.e(TAG, "Error fetching config", e)
-            throw e
+            Log.w(TAG, "Failed to decode password64, using raw value: ${e.message}")
+            decodedPassword = config.password64
         }
+        config
     }
 
                 suspend fun syncCatalog(baseUri: String, onProgress: (Float) -> Unit = {}) = withContext(Dispatchers.IO) {

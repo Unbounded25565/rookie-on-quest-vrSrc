@@ -9,6 +9,7 @@ import com.vrpirates.rookieonquest.data.Constants
 import com.vrpirates.rookieonquest.data.NetworkModule
 import com.vrpirates.rookieonquest.logic.CatalogParser
 import com.vrpirates.rookieonquest.logic.CatalogUtils
+import com.vrpirates.rookieonquest.network.PublicConfig
 import com.vrpirates.rookieonquest.network.VrpService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.withLock
@@ -35,8 +36,11 @@ class CatalogUpdateWorker(
         Log.i(TAG, "Checking for catalog updates in background...")
 
         try {
-            val service = NetworkModule.retrofit.create(VrpService::class.java)
-            val config = service.getPublicConfig()
+            // Use hardcoded config instead of fetching from API
+            val config = PublicConfig(
+                baseUri = "https://go.srcdl1.xyz/",
+                password64 = "WjB3MU9WWm1aMUI0YjBoUw=="
+            )
             val baseUri = config.baseUri
 
             // 1. Initial lightweight check (outside lock)

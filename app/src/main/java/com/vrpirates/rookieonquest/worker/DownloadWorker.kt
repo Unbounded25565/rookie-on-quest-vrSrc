@@ -521,7 +521,11 @@ class DownloadWorker(
     private suspend fun fetchConfig(): PublicConfig {
         if (cachedConfig != null) return cachedConfig!!
 
-        val config = service.getPublicConfig()
+        // Return hardcoded config instead of fetching from API
+        val config = PublicConfig(
+            baseUri = "https://go.srcdl1.xyz/",
+            password64 = "WjB3MU9WWm1aMUI0YjBoUw=="
+        )
         cachedConfig = config
         try {
             val decoded = Base64.decode(config.password64, Base64.DEFAULT)
