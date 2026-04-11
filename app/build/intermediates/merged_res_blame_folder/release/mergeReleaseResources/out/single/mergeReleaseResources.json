@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.vrpirates.rookieonquest.app-release-53:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.vrpirates.rookieonquest.app-main-54:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.vrpirates.rookieonquest.app-release-53:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.vrpirates.rookieonquest.app-main-54:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.vrpirates.rookieonquest.app-release-53:/xml_file_paths.xml.flat",
+        "source": "com.vrpirates.rookieonquest.app-main-54:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.vrpirates.rookieonquest.app-release-53:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.vrpirates.rookieonquest.app-main-54:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.vrpirates.rookieonquest.app-release-53:/drawable_app_icon.png.flat",
+        "source": "com.vrpirates.rookieonquest.app-main-54:/drawable/app_icon.png"
+    }
+]

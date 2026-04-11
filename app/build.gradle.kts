@@ -75,17 +75,7 @@ android {
         // Secure Update Secret: Required for release builds
         // LOCAL DEV: Add to local.properties -> ROOKIE_UPDATE_SECRET=your_secret
         // CI/CD: Set as GitHub repository secret (ROOKIE_UPDATE_SECRET)
-        // Sources: 1. Gradle Property (-PROOKIE_UPDATE_SECRET), 2. local.properties
-        val localProperties = Properties().apply {
-            val localFile = rootProject.file("local.properties")
-            if (localFile.exists()) {
-                localFile.inputStream().use { load(it) }
-            }
-        }
-        
-        val updateSecret = project.findProperty("ROOKIE_UPDATE_SECRET")?.toString() 
-            ?: localProperties.getProperty("ROOKIE_UPDATE_SECRET") 
-            ?: ""
+        val updateSecret = project.findProperty("ROOKIE_UPDATE_SECRET")?.toString() ?: ""
             
         val isRelease = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
 
@@ -116,13 +106,21 @@ android {
     signingConfigs {
         create("release") {
             if (hasReleaseKeystore) {
-                val properties = Properties()
-                properties.load(FileInputStream(keystorePropertiesFile))
+                val props = keystorePropertiesFile.readText(Charsets.UTF_8)
+                    .lineSequence()
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() && !it.startsWith("#") }
+                    .mapNotNull { line ->
+                        val idx = line.indexOf('=')
+                        if (idx < 0) return@mapNotNull null
+                        line.substring(0, idx).trim() to line.substring(idx + 1).trim()
+                    }
+                    .toMap()
 
-                storeFile = file(properties.getProperty("storeFile"))
-                storePassword = properties.getProperty("storePassword")
-                keyAlias = properties.getProperty("keyAlias")
-                keyPassword = properties.getProperty("keyPassword")
+                storeFile = file(props["storeFile"] ?: "")
+                storePassword = props["storePassword"]
+                keyAlias = props["keyAlias"]
+                keyPassword = props["keyPassword"]
 
                 logger.lifecycle("[signing] Release signing config loaded from keystore.properties")
             } else {

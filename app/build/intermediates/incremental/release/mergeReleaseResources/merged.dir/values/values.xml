@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools" xmlns:ns2="urn:oasis:names:tc:xliff:document:1.2">
+    <attr format="reference" name="nestedScrollViewStyle"/>
+    <bool name="enable_system_alarm_service_default">true</bool>
+    <bool name="enable_system_foreground_service_default">true</bool>
+    <bool name="enable_system_job_service_default">false</bool>
+    <bool name="workmanager_test_configuration">false</bool>
+    <color name="androidx_core_ripple_material_light">#1f000000</color>
+    <color name="androidx_core_secondary_text_default_material_light">#8a000000</color>
+    <color name="call_notification_answer_color">#1d873b</color>
+    <color name="call_notification_decline_color">#d93025</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="notification_action_color_filter">#ffffffff</color>
+    <color name="notification_icon_bg_color">#ff9e9e9e</color>
+    <dimen name="compat_button_inset_horizontal_material">4dp</dimen>
+    <dimen name="compat_button_inset_vertical_material">6dp</dimen>
+    <dimen name="compat_button_padding_horizontal_material">8dp</dimen>
+    <dimen name="compat_button_padding_vertical_material">4dp</dimen>
+    <dimen name="compat_control_corner_material">2dp</dimen>
+    <dimen name="compat_notification_large_icon_max_height">320dp</dimen>
+    <dimen name="compat_notification_large_icon_max_width">320dp</dimen>
+    <dimen name="notification_action_icon_size">32dp</dimen>
+    <dimen name="notification_action_text_size">13sp</dimen>
+    <dimen name="notification_big_circle_margin">12dp</dimen>
+    <dimen name="notification_content_margin_start">8dp</dimen>
+    <dimen name="notification_large_icon_height">64dp</dimen>
+    <dimen name="notification_large_icon_width">64dp</dimen>
+    <dimen name="notification_main_column_padding_top">10dp</dimen>
+    <dimen name="notification_media_narrow_margin">@dimen/notification_content_margin_start</dimen>
+    <dimen name="notification_right_icon_size">16dp</dimen>
+    <dimen name="notification_right_side_padding_top">2dp</dimen>
+    <dimen name="notification_small_icon_background_padding">3dp</dimen>
+    <dimen name="notification_small_icon_size_as_large">24dp</dimen>
+    <dimen name="notification_subtext_size">13sp</dimen>
+    <dimen name="notification_top_pad">10dp</dimen>
+    <dimen name="notification_top_pad_large_text">5dp</dimen>
+    <drawable name="notification_template_icon_bg">#3333B5E5</drawable>
+    <drawable name="notification_template_icon_low_bg">#0cffffff</drawable>
+    <item name="accessibility_action_clickable_span" type="id"/>
+    <item name="accessibility_custom_action_0" type="id"/>
+    <item name="accessibility_custom_action_1" type="id"/>
+    <item name="accessibility_custom_action_10" type="id"/>
+    <item name="accessibility_custom_action_11" type="id"/>
+    <item name="accessibility_custom_action_12" type="id"/>
+    <item name="accessibility_custom_action_13" type="id"/>
+    <item name="accessibility_custom_action_14" type="id"/>
+    <item name="accessibility_custom_action_15" type="id"/>
+    <item name="accessibility_custom_action_16" type="id"/>
+    <item name="accessibility_custom_action_17" type="id"/>
+    <item name="accessibility_custom_action_18" type="id"/>
+    <item name="accessibility_custom_action_19" type="id"/>
+    <item name="accessibility_custom_action_2" type="id"/>
+    <item name="accessibility_custom_action_20" type="id"/>
+    <item name="accessibility_custom_action_21" type="id"/>
+    <item name="accessibility_custom_action_22" type="id"/>
+    <item name="accessibility_custom_action_23" type="id"/>
+    <item name="accessibility_custom_action_24" type="id"/>
+    <item name="accessibility_custom_action_25" type="id"/>
+    <item name="accessibility_custom_action_26" type="id"/>
+    <item name="accessibility_custom_action_27" type="id"/>
+    <item name="accessibility_custom_action_28" type="id"/>
+    <item name="accessibility_custom_action_29" type="id"/>
+    <item name="accessibility_custom_action_3" type="id"/>
+    <item name="accessibility_custom_action_30" type="id"/>
+    <item name="accessibility_custom_action_31" type="id"/>
+    <item name="accessibility_custom_action_4" type="id"/>
+    <item name="accessibility_custom_action_5" type="id"/>
+    <item name="accessibility_custom_action_6" type="id"/>
+    <item name="accessibility_custom_action_7" type="id"/>
+    <item name="accessibility_custom_action_8" type="id"/>
+    <item name="accessibility_custom_action_9" type="id"/>
+    <item name="androidx_compose_ui_view_composition_context" type="id"/>
+    <item name="coil_request_manager" type="id"/>
+    <item name="compose_view_saveable_id_tag" type="id"/>
+    <item name="consume_window_insets_tag" type="id"/>
+    <item name="hide_in_inspector_tag" type="id"/>
+    <item name="inspection_slot_table_set" type="id"/>
+    <item name="is_pooling_container_tag" type="id"/>
+    <item name="line1" type="id"/>
+    <item name="line3" type="id"/>
+    <item name="pooling_container_listener_holder_tag" type="id"/>
+    <item name="report_drawn" type="id"/>
+    <item name="tag_accessibility_actions" type="id"/>
+    <item name="tag_accessibility_clickable_spans" type="id"/>
+    <item name="tag_accessibility_heading" type="id"/>
+    <item name="tag_accessibility_pane_title" type="id"/>
+    <item name="tag_on_apply_window_listener" type="id"/>
+    <item name="tag_on_receive_content_listener" type="id"/>
+    <item name="tag_on_receive_content_mime_types" type="id"/>
+    <item name="tag_screen_reader_focusable" type="id"/>
+    <item name="tag_state_description" type="id"/>
+    <item name="tag_transition_group" type="id"/>
+    <item name="tag_unhandled_key_event_manager" type="id"/>
+    <item name="tag_unhandled_key_listeners" type="id"/>
+    <item name="tag_window_insets_animation_callback" type="id"/>
+    <item name="text" type="id"/>
+    <item name="text2" type="id"/>
+    <item name="title" type="id"/>
+    <id name="view_tree_lifecycle_owner"/>
+    <id name="view_tree_on_back_pressed_dispatcher_owner"/>
+    <id name="view_tree_saved_state_registry_owner"/>
+    <id name="view_tree_view_model_store_owner"/>
+    <item name="wrapped_composition_tag" type="id"/>
+    <integer name="status_bar_notification_info_maxnum">999</integer>
+    <string name="androidx_startup" translatable="false">androidx.startup</string>
+    <string name="app_name">Rookie On Quest</string>
+    <string name="bottom_sheet_collapse_description">Collapse bottom sheet</string>
+    <string name="bottom_sheet_dismiss_description">Dismiss bottom sheet</string>
+    <string name="bottom_sheet_drag_handle_description">Drag handle</string>
+    <string name="bottom_sheet_expand_description">Expand bottom sheet</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_delete">DELETE</string>
+    <string name="btn_grant">Grant Permission</string>
+    <string name="btn_later">Later</string>
+    <string name="btn_open_settings">Open Settings</string>
+    <string name="btn_update_now">UPDATE NOW</string>
+    <string name="call_notification_answer_action">Answer</string>
+    <string name="call_notification_answer_video_action">Video</string>
+    <string name="call_notification_decline_action">Decline</string>
+    <string name="call_notification_hang_up_action">Hang Up</string>
+    <string name="call_notification_incoming_text">Incoming call</string>
+    <string name="call_notification_ongoing_text">Ongoing call</string>
+    <string name="call_notification_screening_text">Screening an incoming call</string>
+    <string name="catalog_btn_dismiss">DISMISS</string>
+    <string name="catalog_btn_sync_now">SYNC NOW</string>
+    <string name="catalog_sync_failed">Sync failed. Try again from Settings.</string>
+    <string name="catalog_syncing">Syncing catalog...</string>
+    <string name="catalog_syncing_progress">Syncing catalog... %1$d%%</string>
+    <string name="catalog_syncing_title">CATALOG SYNC</string>
+    <string name="catalog_syncing_with_count">Syncing %1$d new/updated games... %2$d%%</string>
+    <string name="catalog_syncing_with_count_simple">Syncing %1$d new/updated games...</string>
+    <string name="catalog_update_calculating">Calculating changes...</string>
+    <string name="catalog_update_message">%1$d games added/updated. Sync now to see the latest games.</string>
+    <string name="catalog_update_message_simple">Sync now to see the latest games and updates.</string>
+    <string name="catalog_update_title">New Catalog Available</string>
+    <string name="close_drawer">"Close navigation menu"</string>
+    <string name="close_sheet">"Close sheet"</string>
+    <string name="collapsed">Collapsed</string>
+    <string name="date_input_headline">Entered date</string>
+    <string name="date_input_headline_description">Entered date: %1$s</string>
+    <string name="date_input_invalid_for_pattern">Date does not match expected pattern: %1$s</string>
+    <string name="date_input_invalid_not_allowed">Date not allowed: %1$s</string>
+    <string name="date_input_invalid_year_range">
+        Date out of expected year range %1$s - %2$s
+    </string>
+    <string name="date_input_label">Date</string>
+    <string name="date_input_no_input_description">None</string>
+    <string name="date_input_title">Select date</string>
+    <string name="date_picker_headline">"Selected date"</string>
+    <string name="date_picker_headline_description">Current selection: %1$s</string>
+    <string name="date_picker_navigate_to_year_description">Navigate to year %1$s</string>
+    <string name="date_picker_no_selection_description">None</string>
+    <string name="date_picker_scroll_to_earlier_years">Scroll to show earlier years</string>
+    <string name="date_picker_scroll_to_later_years">Scroll to show later years</string>
+    <string name="date_picker_switch_to_calendar_mode">Switch to calendar input mode</string>
+    <string name="date_picker_switch_to_day_selection">
+        "Swipe to select a year, or tap to switch back to selecting a day"
+    </string>
+    <string name="date_picker_switch_to_input_mode">Switch to text input mode</string>
+    <string name="date_picker_switch_to_next_month">"Change to next month"</string>
+    <string name="date_picker_switch_to_previous_month">"Change to previous month"</string>
+    <string name="date_picker_switch_to_year_selection">"Switch to selecting a year"</string>
+    <string name="date_picker_title">"Select date"</string>
+    <string name="date_picker_today_description">Today</string>
+    <string name="date_picker_year_picker_pane_title">Year picker visible</string>
+    <string name="date_range_input_invalid_range_input">Invalid date range input</string>
+    <string name="date_range_input_title">Enter dates</string>
+    <string name="date_range_picker_day_in_range">In range</string>
+    <string name="date_range_picker_end_headline">End date</string>
+    <string name="date_range_picker_scroll_to_next_month">Scroll to show the next month</string>
+    <string name="date_range_picker_scroll_to_previous_month">Scroll to show the previous month</string>
+    <string name="date_range_picker_start_headline">Start date</string>
+    <string name="date_range_picker_title">Select dates</string>
+    <string name="default_error_message">"Invalid input"</string>
+    <string name="default_popup_window_title" ns1:ignore="ExtraTranslation">"Pop-Up Window"</string>
+    <string name="dialog">"Dialog"</string>
+    <string name="dialog_delete_download_msg">Are you sure you want to delete the downloaded files for %1$s?</string>
+    <string name="dialog_delete_download_title">Delete Download?</string>
+    <string name="dropdown_menu">"Dropdown menu"</string>
+    <string name="expanded">Expanded</string>
+    <string name="filter_local_installs">Ready to Install</string>
+    <string name="game_btn_complete_install">COMPLETE INSTALL</string>
+    <string name="game_btn_delete_download">DELETE DOWNLOAD</string>
+    <string name="game_btn_download">DOWNLOAD</string>
+    <string name="game_btn_in_queue">IN QUEUE</string>
+    <string name="game_btn_install">INSTALL</string>
+    <string name="game_btn_installed">INSTALLED</string>
+    <string name="game_btn_paused">PAUSED</string>
+    <string name="game_btn_resume">RESUME</string>
+    <string name="game_btn_uninstall">UNINSTALL</string>
+    <string name="game_btn_update">UPDATE</string>
+    <string name="in_progress">In progress</string>
+    <string name="indeterminate">Partially checked</string>
+    <string name="m3c_bottom_sheet_pane_title">Bottom Sheet</string>
+    <string name="msg_critical_permissions_granted">Required permissions granted. Installing... (Battery optimization recommended but not required)</string>
+    <string name="msg_permissions_granted">Permissions granted. Installing...</string>
+    <string name="navigation_menu">"Navigation menu"</string>
+    <string name="not_selected">Not selected</string>
+    <string name="off">Off</string>
+    <string name="on">On</string>
+    <string name="perm_battery_desc">Allow Rookie On Quest to run in the background without battery restrictions. This prevents interruptions during long downloads.</string>
+    <string name="perm_battery_optimization_desc">Prevents the system from killing Rookie during long downloads.</string>
+    <string name="perm_battery_optimization_title">Battery Optimization</string>
+    <string name="perm_battery_title">Battery Optimization Permission Required</string>
+    <string name="perm_battery_why">Why: Large game downloads can take 30+ minutes. Battery optimization may pause downloads unexpectedly.</string>
+    <string name="perm_denial_message">Permission required. Please grant %1$s in Settings to install games.</string>
+    <string name="perm_install_desc">Allow Rookie On Quest to install game files (APK) directly on your headset.</string>
+    <string name="perm_install_title">Install Apps Permission Required</string>
+    <string name="perm_install_unknown_apps_desc">Allows Rookie to install the games you download.</string>
+    <string name="perm_install_unknown_apps_title">Install Unknown Apps</string>
+    <string name="perm_install_why">Why: Quest headsets require special permission to install APK files from outside the official store.</string>
+    <string name="perm_manage_storage_desc">Required to copy OBB and game files to storage.</string>
+    <string name="perm_manage_storage_title">File Access</string>
+    <string name="perm_name_battery">Battery Optimization</string>
+    <string name="perm_name_install">Install Apps</string>
+    <string name="perm_name_storage">Storage Access</string>
+    <string name="perm_overlay_grant_button">GRANT PERMISSIONS</string>
+    <string name="perm_overlay_subtitle">Rookie On Quest needs some permissions to sideload games directly to your headset library.</string>
+    <string name="perm_overlay_title">Action Required</string>
+    <string name="perm_revoked_msg">The %1$s permission was revoked. Please grant it again to install games.</string>
+    <string name="perm_revoked_multiple_msg">%1$d permissions were revoked. Please grant them again to install games.</string>
+    <string name="perm_revoked_title">Permission Revoked</string>
+    <string name="perm_storage_desc">Allow access to manage all files for game data. This is required to copy OBB files to the correct location.</string>
+    <string name="perm_storage_title">Storage Access Permission Required</string>
+    <string name="perm_storage_why">Why: Many VR games require OBB data files that must be copied to a specific system folder.</string>
+    <string name="range_end">"Range end"</string>
+    <string name="range_start">"Range start"</string>
+    <string name="search_bar_search">Search</string>
+    <string name="selected">Selected</string>
+    <string name="snackbar_dismiss">Dismiss</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+    <string name="status_blocked_permissions">Blocked: Missing Permissions</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_downloading">Downloading...</string>
+    <string name="status_extracting">Extracting...</string>
+    <string name="status_failed">Failed</string>
+    <string name="status_installing">Installing...</string>
+    <string name="status_local_verifying">Fast Track: Verifying local files...</string>
+    <string name="status_paused">Paused</string>
+    <string name="status_pending_install">Awaiting installer completion...</string>
+    <string name="status_queued">Queued</string>
+    <string name="status_shelved">Ready to Install (Local)</string>
+    <string name="status_waiting_permissions">Waiting for permissions...</string>
+    <string name="suggestions_available">Suggestions below</string>
+    <string name="switch_role">Switch</string>
+    <string name="tab">Tab</string>
+    <string name="template_percent"><ns2:g id="percentage">%1$d</ns2:g> percent.</string>
+    <string name="time_picker_am">AM</string>
+    <string name="time_picker_hour">Hour</string>
+    <string name="time_picker_hour_24h_suffix">%1$d hours</string>
+    <string name="time_picker_hour_selection">Select hour</string>
+    <string name="time_picker_hour_suffix">%1$d o\'clock</string>
+    <string name="time_picker_hour_text_field">for hour</string>
+    <string name="time_picker_minute">Minute</string>
+    <string name="time_picker_minute_selection">Select minutes</string>
+    <string name="time_picker_minute_suffix">%1$d minutes</string>
+    <string name="time_picker_minute_text_field">for minutes</string>
+    <string name="time_picker_period_toggle_description">Select AM or PM</string>
+    <string name="time_picker_pm">PM</string>
+    <string name="tooltip_long_press_label">Show tooltip</string>
+    <string name="tooltip_pane_description">Tooltip</string>
+    <string name="update_available_desc">A new version of Rookie is available. Keeping the app up to date ensures compatibility with the latest games.</string>
+    <string name="update_available_title">Update Available</string>
+    <style name="DialogWindowTheme">
+        <item name="android:windowClipToOutline">false</item>
+    </style>
+    <style name="FloatingDialogTheme">
+        <item name="android:windowIsFloating">false</item>
+    </style>
+    <style name="FloatingDialogWindowTheme">
+        <item name="android:windowClipToOutline">false</item>
+        <item name="android:dialogTheme">@style/FloatingDialogTheme</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent"/>
+    <style name="TextAppearance.Compat.Notification.Info">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification.Line2" parent="TextAppearance.Compat.Notification.Info"/>
+    <style name="TextAppearance.Compat.Notification.Time">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
+    <style name="Theme.RookieOnQuest" parent="android:Theme.Material.Light.NoActionBar"/>
+    <style name="Widget.Compat.NotificationActionContainer" parent=""/>
+    <style name="Widget.Compat.NotificationActionText" parent=""/>
+    <declare-styleable name="AnimatedStateListDrawableCompat">
+        
+        <attr name="android:visible"/>
+        
+        <attr name="android:variablePadding"/>
+        
+        <attr name="android:constantSize"/>
+        
+        <attr name="android:dither"/>
+        
+        <attr name="android:enterFadeDuration"/>
+        
+        <attr name="android:exitFadeDuration"/>
+        
+        
+    </declare-styleable>
+    <declare-styleable name="AnimatedStateListDrawableItem">
+        
+        <attr name="android:drawable"/>
+        
+        <attr name="android:id"/>
+    </declare-styleable>
+    <declare-styleable name="AnimatedStateListDrawableTransition">
+        
+        <attr name="android:fromId"/>
+        
+        <attr name="android:toId"/>
+        
+        <attr name="android:drawable"/>
+        
+        <attr name="android:reversible"/>
+    </declare-styleable>
+    <declare-styleable name="Capability">
+        
+        <attr format="reference" name="queryPatterns"/>
+        
+        <attr format="boolean" name="shortcutMatchRequired"/>
+    </declare-styleable>
+    <declare-styleable name="ColorStateListItem">
+        
+        <attr name="android:color"/>
+        
+        <attr format="float" name="alpha"/>
+        <attr name="android:alpha"/>
+        
+        <attr format="float" name="lStar"/>
+        <attr name="android:lStar"/>
+    </declare-styleable>
+    <declare-styleable name="FontFamily">
+        
+        <attr format="string" name="fontProviderAuthority"/>
+        
+        <attr format="string" name="fontProviderPackage"/>
+        
+        <attr format="string" name="fontProviderQuery"/>
+        
+        <attr format="reference" name="fontProviderCerts"/>
+        
+        <attr name="fontProviderFetchStrategy">
+            <!-- The blocking font fetch works as follows.
+              First, check the local cache, then if the requested font is not cached, request the
+              font from the provider and wait until it is finished.  You can change the length of
+              the timeout by modifying fontProviderFetchTimeout.  If the timeout happens, the
+              default typeface will be used instead. -->
+            <enum name="blocking" value="0"/>
+            <!-- The async font fetch works as follows.
+              First, check the local cache, then if the requeted font is not cached, trigger a
+              request the font and continue with layout inflation. Once the font fetch succeeds, the
+              target text view will be refreshed with the downloaded font data. The
+              fontProviderFetchTimeout will be ignored if async loading is specified. -->
+            <enum name="async" value="1"/>
+        </attr>
+        
+        <attr format="integer" name="fontProviderFetchTimeout">
+            <!-- A special value for the timeout. In this case, the blocking font fetching will not
+              timeout and wait until a reply is received from the font provider. -->
+            <enum name="forever" value="-1"/>
+        </attr>
+        
+        <attr format="string" name="fontProviderSystemFontFamily"/>
+    </declare-styleable>
+    <declare-styleable name="FontFamilyFont">
+        
+        <attr name="fontStyle">
+            <enum name="normal" value="0"/>
+            <enum name="italic" value="1"/>
+        </attr>
+        
+        <attr format="reference" name="font"/>
+        
+        <attr format="integer" name="fontWeight"/>
+        
+        <attr format="string" name="fontVariationSettings"/>
+        
+        <attr format="integer" name="ttcIndex"/>
+        
+        <attr name="android:fontStyle"/>
+        <attr name="android:font"/>
+        <attr name="android:fontWeight"/>
+        <attr name="android:fontVariationSettings"/>
+        <attr name="android:ttcIndex"/>
+    </declare-styleable>
+    <declare-styleable name="GradientColor">
+        
+        <attr name="android:startColor"/>
+        
+        <attr name="android:centerColor"/>
+        
+        <attr name="android:endColor"/>
+        
+        <attr name="android:type"/>
+
+        
+        
+        <attr name="android:gradientRadius"/>
+
+        
+        
+        <attr name="android:centerX"/>
+        
+        <attr name="android:centerY"/>
+
+        
+        
+        <attr name="android:startX"/>
+        
+        <attr name="android:startY"/>
+        
+        <attr name="android:endX"/>
+        
+        <attr name="android:endY"/>
+
+        
+        <attr name="android:tileMode"/>
+    </declare-styleable>
+    <declare-styleable name="GradientColorItem">
+        
+        <attr name="android:offset"/>
+        
+        <attr name="android:color"/>
+    </declare-styleable>
+    <declare-styleable name="StateListDrawable">
+        
+        <attr name="android:visible"/>
+        
+        <attr name="android:variablePadding"/>
+        
+        <attr name="android:constantSize"/>
+        
+        <attr name="android:dither"/>
+        
+        <attr name="android:enterFadeDuration"/>
+        
+        <attr name="android:exitFadeDuration"/>
+        
+        
+    </declare-styleable>
+    <declare-styleable name="StateListDrawableItem">
+        
+        <attr name="android:drawable"/>
+    </declare-styleable>
+</resources>

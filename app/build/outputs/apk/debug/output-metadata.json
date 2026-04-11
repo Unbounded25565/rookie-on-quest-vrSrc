@@ -1,0 +1,21 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.vrpirates.rookieonquest",
+  "variantName": "debug",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 12,
+      "versionName": "3.0.0",
+      "outputFile": "RookieOnQuest-v3.0.0.apk"
+    }
+  ],
+  "elementType": "File",
+  "minSdkVersionForDexing": 29
+}
