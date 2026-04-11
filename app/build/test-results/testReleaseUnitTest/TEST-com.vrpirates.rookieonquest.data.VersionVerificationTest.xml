@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.VersionVerificationTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:24.848Z" hostname="codespaces-952529" time="0.036">
+  <properties/>
+  <testcase name="versionCompare_installedVersionHigher" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.001"/>
+  <testcase name="versionCompare_catalogVersionHigher" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="verificationLogic_successWhenVersionsMatch" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="versionCode_handleMalformedString" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.006"/>
+  <testcase name="versionCompare_handleBothInvalid" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="verificationLogic_failWhenVersionsMismatch" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.001"/>
+  <testcase name="versionCode_handleNegativeNumbers" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="versionCode_handleWhitespace" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.02"/>
+  <testcase name="versionCode_parseValidNumber" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="versionCompare_matchingVersions" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="versionCode_handleZero" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="versionCode_handleEmptyString" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="verificationLogic_handleLargeVersionNumbers" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="verificationLogic_handleNullCatalogVersion" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <testcase name="versionCompare_handleInvalidCatalogVersion" classname="com.vrpirates.rookieonquest.data.VersionVerificationTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:14.030Z" hostname="codespaces-952529" time="0.038">
+  <properties/>
+  <testcase name="mergeOrder_matchesExpectedSequence" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.009"/>
+  <testcase name="is7zArchive_detectsStandardArchive" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.0"/>
+  <testcase name="is7zArchive_detectsMultiPart" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.003"/>
+  <testcase name="mergeOrder_withSinglePart" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.002"/>
+  <testcase name="archiveParts_sortedLexicographically_withPath" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.0"/>
+  <testcase name="is7zArchive_caseInsensitive" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.001"/>
+  <testcase name="archiveParts_sortedLexicographically_singleDigit" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.0"/>
+  <testcase name="archiveParts_sortedLexicographically_doubleDigit" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.005"/>
+  <testcase name="archiveParts_sortedLexicographically_manyParts" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.009"/>
+  <testcase name="archiveParts_sortedLexicographically_mixedPrefixes" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.0"/>
+  <testcase name="archiveParts_sortedNaturally_mixedPaddedAndNonPadded" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.005"/>
+  <testcase name="archiveParts_sortedNaturally_nonPadded" classname="com.vrpirates.rookieonquest.data.MultiPartArchiveTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

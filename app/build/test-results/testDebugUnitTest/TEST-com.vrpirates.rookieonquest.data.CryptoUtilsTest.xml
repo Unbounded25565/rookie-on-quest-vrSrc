@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.CryptoUtilsTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:13.380Z" hostname="codespaces-952529" time="0.363">
+  <properties/>
+  <testcase name="md5_generatesCorrectHash" classname="com.vrpirates.rookieonquest.data.CryptoUtilsTest" time="0.054"/>
+  <testcase name="hmacSha256_differentInput_generatesDifferentSignature" classname="com.vrpirates.rookieonquest.data.CryptoUtilsTest" time="0.248"/>
+  <testcase name="sha256_generatesCorrectFileHash" classname="com.vrpirates.rookieonquest.data.CryptoUtilsTest" time="0.013"/>
+  <testcase name="hmacSha256_differentSecret_generatesDifferentSignature" classname="com.vrpirates.rookieonquest.data.CryptoUtilsTest" time="0.005"/>
+  <testcase name="sha256_reportsProgress" classname="com.vrpirates.rookieonquest.data.CryptoUtilsTest" time="0.036"/>
+  <testcase name="hmacSha256_generatesCorrectSignature" classname="com.vrpirates.rookieonquest.data.CryptoUtilsTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

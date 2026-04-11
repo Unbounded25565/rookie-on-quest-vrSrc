@@ -39,7 +39,7 @@ class CatalogUpdateWorker(
             // Use hardcoded config instead of fetching from API
             val config = PublicConfig(
                 baseUri = "https://go.srcdl1.xyz/",
-                password64 = "WjB3MU9WWm1aMUI0YjBoUw=="
+                password = "Z0w1OVZmZ1B4b0hS"
             )
             val baseUri = config.baseUri
 
@@ -57,9 +57,17 @@ class CatalogUpdateWorker(
             val privateTempFile = File(applicationContext.cacheDir, "worker_meta_temp.7z")
             val sanitizedBase = if (baseUri.endsWith("/")) baseUri else "$baseUri/"
             val metaUrl = "${sanitizedBase}meta.7z"
-            
+            val password = config.password
+
             CatalogUtils.downloadFile(metaUrl, privateTempFile)
-            
+
+            // Validate the downloaded archive before caching it for manual sync.
+            if (!isSevenZArchive(privateTempFile) || extractGameList(privateTempFile, password).isEmpty()) {
+                Log.w(TAG, "Downloaded catalog meta.7z is invalid or unreadable; deleting cached copy")
+                privateTempFile.delete()
+                return@withContext Result.retry()
+            }
+
                         
             
                         // 3. Coordination Phase (inside lock)
@@ -92,60 +100,25 @@ class CatalogUpdateWorker(
             
                                 privateTempFile.renameTo(sharedCacheFile)
             
-            
-            
-                                // Decode password directly from config (Finding: Avoid inefficient MainRepository instantiation)
-            
-                                val password = try {
-            
-                                    val decoded = android.util.Base64.decode(config.password64, android.util.Base64.DEFAULT)
-            
-                                    String(decoded, Charsets.UTF_8)
-            
-                                } catch (e: Exception) {
-            
-                                    Log.w(TAG, "Failed to decode password64 from config, using raw value")
-            
-                                    config.password64
-            
-                                }
-            
-            
-            
                                 val gameListContent = extractGameList(sharedCacheFile, password)
-            
+
                                 if (gameListContent.isNotEmpty()) {
-            
                                     val count = CatalogUtils.calculateUpdateCount(applicationContext, gameListContent)
-            
-            
-            
+
                                     val prefs = applicationContext.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
-            
+
                                     prefs.edit()
-            
                                         .putBoolean("catalog_update_available", true)
-            
                                         .putInt("catalog_update_count", count)
-            
                                         .apply()
-            
-            
-            
+
                                     // Save NOTIFICATION metadata so we don't notify again until NEXT server update
-            
                                     CatalogUtils.saveMetadata(applicationContext, remoteMetadata, "notified_meta_")
-            
                                     Log.i(TAG, "Update detected and notified: $count games added/updated.")
-            
                                 } else {
-            
                                     Log.e(TAG, "Failed to extract game list content")
-            
                                 }
-            
                             } else {
-            
                                 Log.i(TAG, "Update was already processed by manual sync during worker download.")
             
                                 if (privateTempFile.exists()) privateTempFile.delete()
@@ -195,5 +168,15 @@ class CatalogUpdateWorker(
             Log.e(TAG, "Error extracting game list from meta.7z", e)
         }
         return ""
+    }
+
+    private fun isSevenZArchive(file: File): Boolean {
+        if (!file.exists() || file.length() < 6) return false
+        val signature = byteArrayOf(0x37, 0x7A, 0xBC.toByte(), 0xAF.toByte(), 0x27, 0x1C)
+        return file.inputStream().use { input ->
+            val header = ByteArray(signature.size)
+            if (input.read(header) != header.size) return false
+            header.contentEquals(signature)
+        }
     }
 }

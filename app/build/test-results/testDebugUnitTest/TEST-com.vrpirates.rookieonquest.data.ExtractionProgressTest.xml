@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.ExtractionProgressTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:13.874Z" hostname="codespaces-952529" time="0.084">
+  <properties/>
+  <testcase name="progressScaling_atExtractionMidpoint_returns_885_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="progressScaling_atExtractionThreeQuarters_returns_9025_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="progressScaling_isMonotonicallyIncreasing" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.017"/>
+  <testcase name="extractionProgress_withLargeNumbers" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.001"/>
+  <testcase name="progressMilestones_areMonotonicallyIncreasing" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.022"/>
+  <testcase name="progressScaling_neverExceeds92Percent_whenCapped" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.001"/>
+  <testcase name="progressScaling_atExtractionStart_returns_85_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="progressMilestoneExtracting_is_85_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="progressScaling_atExtractionQuarter_returns_8675_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.001"/>
+  <testcase name="progressMilestoneExtractionEnd_is_92_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="mergePhaseExists_between_download_and_extraction" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="progressScaling_atExtractionComplete_returns_92_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.001"/>
+  <testcase name="extractionPhaseSpan_is_7_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="extractionProgress_withZeroTotal_returns_zero" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.0"/>
+  <testcase name="progressScaling_alwaysInValidRange" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.01"/>
+  <testcase name="progressDownloadPhaseEnd_is_80_percent" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.001"/>
+  <testcase name="extractionProgress_withVariousEntryCounts" classname="com.vrpirates.rookieonquest.data.ExtractionProgressTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

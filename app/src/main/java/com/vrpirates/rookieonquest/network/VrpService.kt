@@ -5,7 +5,7 @@ import retrofit2.http.GET
 
 data class PublicConfig(
     @SerializedName("baseUri") val baseUri: String,
-    @SerializedName("password") val password64: String
+    @SerializedName("password") val password: String
 )
 
 interface VrpService {

@@ -1,0 +1,540 @@
+/workspaces/rookie-on-quest-vrSrc/app/src/main/AndroidManifest.xml:8: Warning: The Google Play store has a policy that limits usage of MANAGE_EXTERNAL_STORAGE [ScopedStorage]
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ScopedStorage":
+   Scoped storage is enforced on Android 10+ (or Android 11+ if using
+   requestLegacyExternalStorage). In particular, WRITE_EXTERNAL_STORAGE will
+   no longer provide write access to all files; it will provide the equivalent
+   of READ_EXTERNAL_STORAGE instead.
+
+   As of Android 13, if you need to query or interact with MediaStore or media
+   files on the shared storage, you should be using instead one or more new
+   storage permissions:
+   * android.permission.READ_MEDIA_IMAGES
+   * android.permission.READ_MEDIA_VIDEO
+   * android.permission.READ_MEDIA_AUDIO
+
+   and then add maxSdkVersion="33" to the older permission. See the developer
+   guide for how to do this:
+   https://developer.android.com/about/versions/13/behavior-changes-13#granula
+   r-media-permissions
+
+   The MANAGE_EXTERNAL_STORAGE permission can be used to manage all files, but
+   it is rarely necessary and most apps on Google Play are not allowed to use
+   it. Most apps should instead migrate to use scoped storage. To modify or
+   delete files, apps should request write access from the user as described
+   at https://goo.gle/android-mediastore-createwriterequest.
+
+   To learn more, read these resources: Play policy:
+   https://goo.gle/policy-storage-help Allowable use cases:
+   https://goo.gle/policy-storage-usecases
+
+   https://goo.gle/android-storage-usecases
+
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:14: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk = 34
+        ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application or sdk runs on a version of Android that is more
+   recent than your targetSdkVersion specifies that it has been tested with,
+   various compatibility modes kick in. This ensures that your application
+   continues to work, but it may look out of place. For example, if the
+   targetSdkVersion is less than 14, your app may get an option button in the
+   UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/MainRepository.kt:1891: Warning: Do not hardcode "/sdcard/"; use Environment.getExternalStorageDirectory().getPath() instead [SdCardPath]
+        val normalizedDest = destPath.removePrefix("/sdcard/").removePrefix("sdcard/").removePrefix("/")
+                                                    ~~~~~~~~
+
+   Explanation for issues of type "SdCardPath":
+   Your code should not reference the /sdcard path directly; instead use
+   Environment.getExternalStorageDirectory().getPath().
+
+   Similarly, do not reference the /data/data/ path directly; it can vary in
+   multi-user scenarios. Instead, use Context.getFilesDir().getPath().
+
+   https://developer.android.com/training/data-storage#filesExternal
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:247: Warning: Use of REQUEST_IGNORE_BATTERY_OPTIMIZATIONS violates the Play Store Content Policy regarding acceptable use cases, as described in https://developer.android.com/training/monitoring-device-state/doze-standby.html [BatteryLife]
+                                        Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:701: Warning: Use of REQUEST_IGNORE_BATTERY_OPTIMIZATIONS violates the Play Store Content Policy regarding acceptable use cases, as described in https://developer.android.com/training/monitoring-device-state/doze-standby.html [BatteryLife]
+                                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "BatteryLife":
+   This issue flags code that either
+   * negatively affects battery life, or
+   * uses APIs that have recently changed behavior to prevent background tasks
+   from consuming memory and battery excessively.
+
+   Generally, you should be using WorkManager instead.
+
+   For more details on how to update your code, please see
+   https://developer.android.com/topic/performance/background-optimization
+
+
+/workspaces/rookie-on-quest-vrSrc/gradle/wrapper/gradle-wrapper.properties:4: Warning: A newer version of Gradle than 8.13 is available: 8.14.4 [AndroidGradlePluginVersion]
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AndroidGradlePluginVersion":
+   This detector looks for usage of the Android Gradle Plugin where the
+   version you are using is not the current stable release. Using older
+   versions is fine, and there are cases where you deliberately want to stick
+   with an older version. However, you may simply not be aware that a more
+   recent version is available, and that is what this lint check helps find.
+
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:9: Warning: A newer version of compileSdkVersion than 34 is available: 36 [GradleDependency]
+    compileSdk = 34
+    ~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:269: Warning: A newer version of androidx.core:core-ktx than 1.12.0 is available: 1.18.0 [GradleDependency]
+    implementation("androidx.core:core-ktx:1.12.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:270: Warning: A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.7.0 is available: 2.10.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:271: Warning: A newer version of androidx.lifecycle:lifecycle-viewmodel-compose than 2.7.0 is available: 2.10.0 [GradleDependency]
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:272: Warning: A newer version of androidx.activity:activity-compose than 1.8.2 is available: 1.13.0 [GradleDependency]
+    implementation("androidx.activity:activity-compose:1.8.2")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:273: Warning: A newer version of androidx.compose:compose-bom than 2023.10.01 is available: 2026.03.01 [GradleDependency]
+    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:291: Warning: A newer version of androidx.room:room-runtime than 2.6.1 is available: 2.8.4 [GradleDependency]
+    implementation("androidx.room:room-runtime:$roomVersion")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:292: Warning: A newer version of androidx.room:room-ktx than 2.6.1 is available: 2.8.4 [GradleDependency]
+    implementation("androidx.room:room-ktx:$roomVersion")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:293: Warning: A newer version of androidx.room:room-compiler than 2.6.1 is available: 2.8.4 [GradleDependency]
+    kapt("androidx.room:room-compiler:$roomVersion")
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:294: Warning: A newer version of androidx.room:room-testing than 2.6.1 is available: 2.8.4 [GradleDependency]
+    androidTestImplementation("androidx.room:room-testing:$roomVersion")
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:298: Warning: A newer version of androidx.work:work-runtime-ktx than 2.9.1 is available: 2.11.2 [GradleDependency]
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:299: Warning: A newer version of androidx.work:work-testing than 2.9.1 is available: 2.11.2 [GradleDependency]
+    androidTestImplementation("androidx.work:work-testing:$workVersion")
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:303: Warning: A newer version of androidx.room:room-testing than 2.6.1 is available: 2.8.4 [GradleDependency]
+    testImplementation("androidx.room:room-testing:$roomVersion")
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:305: Warning: A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.3.0 [GradleDependency]
+    testImplementation("androidx.test.ext:junit:1.1.5")
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:306: Warning: A newer version of androidx.test:core than 1.5.0 is available: 1.7.0 [GradleDependency]
+    testImplementation("androidx.test:core:1.5.0")
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:307: Warning: A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.3.0 [GradleDependency]
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:308: Warning: A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.7.0 [GradleDependency]
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:309: Warning: A newer version of androidx.compose:compose-bom than 2023.10.01 is available: 2026.03.01 [GradleDependency]
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:281: Warning: A newer version of com.squareup.retrofit2:retrofit than 2.9.0 is available: 3.0.0 [NewerVersionAvailable]
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:282: Warning: A newer version of com.squareup.retrofit2:converter-gson than 2.9.0 is available: 3.0.0 [NewerVersionAvailable]
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:283: Warning: A newer version of io.coil-kt:coil-compose than 2.5.0 is available: 2.7.0 [NewerVersionAvailable]
+    implementation("io.coil-kt:coil-compose:2.5.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:286: Warning: A newer version of org.apache.commons:commons-compress than 1.26.0 is available: 1.28.0 [NewerVersionAvailable]
+    implementation("org.apache.commons:commons-compress:1.26.0")
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:287: Warning: A newer version of org.tukaani:xz than 1.9 is available: 1.12 [NewerVersionAvailable]
+    implementation("org.tukaani:xz:1.9")
+                   ~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:304: Warning: A newer version of org.jetbrains.kotlinx:kotlinx-coroutines-test than 1.7.3 is available: 1.10.2 [NewerVersionAvailable]
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:312: Warning: A newer version of com.squareup.okhttp3:mockwebserver than 4.12.0 is available: 5.3.2 [NewerVersionAvailable]
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:313: Warning: A newer version of com.squareup.okhttp3:mockwebserver than 4.12.0 is available: 5.3.2 [NewerVersionAvailable]
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NewerVersionAvailable":
+   This detector checks with a central repository to see if there are newer
+   versions available for the dependencies used by this project. This is
+   similar to the GradleDependency check, which checks for newer versions
+   available in the Android SDK tools and libraries, but this works with any
+   MavenCentral dependency, and connects to the library every time, which
+   makes it more flexible but also much slower.
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/ui/GameListItem.kt:56: Warning: Modifier parameter should be the first optional parameter [ModifierParameter from androidx.compose.ui]
+    modifier: Modifier = Modifier
+    ~~~~~~~~
+
+   Explanation for issues of type "ModifierParameter":
+   The first (or only) Modifier parameter in a Composable function should
+   follow the following rules:
+   - Be named modifier
+   - Have a type of Modifier
+   - Either have no default value, or have a default value of Modifier
+   - If optional, be the first optional parameter in the parameter list
+
+   Vendor: Jetpack Compose
+   Identifier: androidx.compose.ui
+   Feedback: https://issuetracker.google.com/issues/new?component=612128
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:32: Warning: Formatting %d followed by words ("permissions"): This should probably be a plural rather than a string [PluralsCandidate]
+    <string name="perm_revoked_multiple_msg">%1$d permissions were revoked. Please grant them again to install games.</string>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:87: Warning: Formatting %d followed by words ("games"): This should probably be a plural rather than a string [PluralsCandidate]
+    <string name="catalog_update_message">%1$d games added/updated. Sync now to see the latest games.</string>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:96: Warning: Formatting %d followed by words ("new"): This should probably be a plural rather than a string [PluralsCandidate]
+    <string name="catalog_syncing_with_count">Syncing %1$d new/updated games... %2$d%%</string>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:97: Warning: Formatting %d followed by words ("new"): This should probably be a plural rather than a string [PluralsCandidate]
+    <string name="catalog_syncing_with_count_simple">Syncing %1$d new/updated games...</string>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "PluralsCandidate":
+   This lint check looks for potential errors in internationalization where
+   you have translated a message which involves a quantity and it looks like
+   other parts of the string may need grammatical changes.
+
+   For example, rather than something like this:
+     <string name="try_again">Try again in %d seconds.</string>
+   you should be using a plural:
+      <plurals name="try_again">
+           <item quantity="one">Try again in %d second</item>
+           <item quantity="other">Try again in %d seconds</item>
+       </plurals>
+   This will ensure that in other languages the right set of translations are
+   provided for the different quantity classes.
+
+   (This check depends on some heuristics, so it may not accurately determine
+   whether a string really should be a quantity. You can use tools:ignore to
+   filter out false positives.
+
+   https://developer.android.com/guide/topics/resources/string-resource.html#Plurals
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/worker/DownloadWorker.kt:680: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/worker/DownloadWorker.kt:742: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:213: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:232: Warning: Unnecessary; SDK_INT is always >= 30 [ObsoleteSdkInt]
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:239: Warning: Unnecessary; SDK_INT is always >= 30 [ObsoleteSdkInt]
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:246: Warning: Unnecessary; SDK_INT is always >= 30 [ObsoleteSdkInt]
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:671: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/MainRepository.kt:396: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+                val vCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.longVersionCode else it.versionCode.toLong()
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/PermissionManager.kt:117: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/PermissionManager.kt:129: Warning: Unnecessary; Build.VERSION.SDK_INT == Build.VERSION_CODES.Q is always true here (SDK_INT = 29) [ObsoleteSdkInt]
+                Build.VERSION.SDK_INT == Build.VERSION_CODES.Q -> {
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/PermissionManager.kt:282: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+                        RequiredPermission.INSTALL_UNKNOWN_APPS -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/PermissionManager.kt:285: Warning: Unnecessary; SDK_INT is always >= 29 [ObsoleteSdkInt]
+                        RequiredPermission.MANAGE_EXTERNAL_STORAGE -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/mipmap-anydpi-v26: Warning: This folder configuration (v26) is unnecessary; minSdkVersion is 29. Merge all the resources in this folder into mipmap-anydpi. [ObsoleteSdkInt]
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+/workspaces/rookie-on-quest-vrSrc/app/build.gradle.kts:293: Warning: This library supports using KSP instead of kapt, which greatly improves performance. Learn more: https://developer.android.com/studio/build/migrate-to-ksp [KaptUsageInsteadOfKsp]
+    kapt("androidx.room:room-compiler:$roomVersion")
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "KaptUsageInsteadOfKsp":
+   KSP is a more efficient replacement for kapt. For libraries that support
+   both, KSP should be used to improve build times.
+
+   https://developer.android.com/studio/build/migrate-to-ksp
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/drawable/ic_launcher_foreground.xml:1: Warning: The resource R.drawable.ic_launcher_foreground appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:15: Warning: The resource R.string.status_waiting_permissions appears to be unused [UnusedResources]
+    <string name="status_waiting_permissions">Waiting for permissions...</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+   Available options:
+
+   **skip-libraries** (default is true):
+   Whether the unused resource check should skip reporting unused resources in libraries.
+
+   Many libraries will declare resources that are part of the library surface; other modules depending on the library will also reference the resources. To avoid reporting all these resources as unused (in the context of a library), the unused resource check normally skips reporting unused resources in libraries. Instead, run the unused resource check on the consuming app module (along with `checkDependencies=true`).
+
+   However, there are cases where you want to check that all the resources declared in a library are used; in that case, you can disable the skip option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UnusedResources">
+           <option name="skip-libraries" value="true" />
+       </issue>
+   </lint>
+   ```
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:6: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="status_downloading">Downloading...</string>
+                                      ~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:7: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="status_extracting">Extracting...</string>
+                                     ~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:8: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="status_installing">Installing...</string>
+                                     ~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:9: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="status_pending_install">Awaiting installer completion...</string>
+                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:13: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="status_local_verifying">Fast Track: Verifying local files...</string>
+                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:15: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="status_waiting_permissions">Waiting for permissions...</string>
+                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:59: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="msg_permissions_granted">Permissions granted. Installing...</string>
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:60: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="msg_critical_permissions_granted">Required permissions granted. Installing... (Battery optimization recommended but not required)</string>
+                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:91: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="catalog_update_calculating">Calculating changes...</string>
+                                              ~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:95: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="catalog_syncing_progress">Syncing catalog... %1$d%%</string>
+                                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:96: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="catalog_syncing_with_count">Syncing %1$d new/updated games... %2$d%%</string>
+                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:97: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="catalog_syncing_with_count_simple">Syncing %1$d new/updated games...</string>
+                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/values/strings.xml:98: Warning: Replace "..." with ellipsis character (…, &#8230;) ? [TypographyEllipsis]
+    <string name="catalog_syncing">Syncing catalog...</string>
+                                   ~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "TypographyEllipsis":
+   You can replace the string "..." with a dedicated ellipsis character,
+   ellipsis character (u2026, &#8230;). This can help make the text more
+   readable.
+
+   https://en.wikipedia.org/wiki/Ellipsis
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml:2: Warning: The application adaptive icon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml:2: Warning: The application adaptive roundIcon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+
+   Explanation for issues of type "MonochromeLauncherIcon":
+   If android:roundIcon and android:icon are both in your manifest, you must
+   either remove the reference to android:roundIcon if it is not needed; or,
+   supply the monochrome icon in the drawable defined by the android:roundIcon
+   and android:icon attribute.
+
+   For example, if android:roundIcon and android:icon are both in the
+   manifest, a launcher might choose to use android:roundIcon over
+   android:icon to display the adaptive app icon. Therefore, your themed
+   application iconwill not show if your monochrome attribute is not also
+   specified in android:roundIcon.
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/res/drawable/app_icon.png: Warning: Found bitmap drawable res/drawable/app_icon.png in densityless folder [IconLocation]
+
+   Explanation for issues of type "IconLocation":
+   The res/drawable folder is intended for density-independent graphics such
+   as shapes defined in XML. For bitmaps, move it to drawable-mdpi and
+   consider providing higher and lower resolution versions in drawable-ldpi,
+   drawable-hdpi and drawable-xhdpi. If the icon really is density independent
+   (for example a solid color) you can place it in drawable-nodpi.
+
+   https://developer.android.com/guide/practices/screens_support.html
+
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/worker/CatalogUpdateWorker.kt:125: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+                                    prefs.edit()
+                                    ~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:225: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                    data = Uri.parse("package:${context.packageName}")
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:225: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                    data = Uri.parse("package:${context.packageName}")
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:234: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                            data = Uri.parse("package:${context.packageName}")
+                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:234: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                            data = Uri.parse("package:${context.packageName}")
+                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:241: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                            data = Uri.parse("package:${context.packageName}")
+                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:241: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                            data = Uri.parse("package:${context.packageName}")
+                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:248: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                            data = Uri.parse("package:${context.packageName}")
+                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:248: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                            data = Uri.parse("package:${context.packageName}")
+                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:674: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                        data = Uri.parse("package:${context.packageName}")
+                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:674: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                        data = Uri.parse("package:${context.packageName}")
+                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:680: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                        data = Uri.parse("package:${context.packageName}")
+                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:680: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                        data = Uri.parse("package:${context.packageName}")
+                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:690: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                        data = Uri.parse("package:${context.packageName}")
+                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:690: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                        data = Uri.parse("package:${context.packageName}")
+                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:702: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                    data = Uri.parse("package:${context.packageName}")
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/MainActivity.kt:702: Warning: Use the KTX extension function String.toUri instead? [UseKtx]
+                                    data = Uri.parse("package:${context.packageName}")
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/ui/MainViewModel.kt:1962: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+                        prefs.edit().putLong("last_catalog_sync_time", now).apply()
+                        ~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/ui/MainViewModel.kt:3518: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        prefs.edit().putBoolean("keep_apks", newValue).apply()
+        ~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/MigrationManager.kt:219: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        sharedPrefs.edit()
+        ~~~~~~~~~~~~~~~~~~
+/workspaces/rookie-on-quest-vrSrc/app/src/main/java/com/vrpirates/rookieonquest/data/MigrationManager.kt:231: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        sharedPrefs.edit()
+        ~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseKtx":
+   The Android KTX libraries decorates the Android platform SDK as well as
+   various libraries with more convenient extension functions available from
+   Kotlin, allowing you to use default parameters, named parameters, and
+   more.
+
+   Available options:
+
+   **remove-defaults** (default is true):
+   Whether to skip arguments that match the defaults provided by the extension.
+
+   Extensions often provide default values for some of the parameters. For example:
+   ```kotlin
+   fun Path.readLines(charset: Charset = Charsets.UTF_8): List<String> { return Files.readAllLines(this, charset) }
+   ```
+   This lint check will by default automatically omit parameters that match the default, so if your code was calling
+
+   ```kotlin
+   Files.readAllLines(file, Charset.UTF_8)
+   ```
+   lint would replace this with
+   ```kotlin
+   file.readLines()
+   ```
+   rather than
+
+   ```kotlin
+   file.readLines(Charset.UTF_8
+   ```
+   You can turn this behavior off using this option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="remove-defaults" value="true" />
+       </issue>
+   </lint>
+   ```
+
+   **require-present** (default is true):
+   Whether to only offer extensions already available.
+
+   This option lets you only have lint suggest extension replacements if those extensions are already available on the class path (in other words, you're already depending on the library containing the extension method.)
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="require-present" value="true" />
+       </issue>
+   </lint>
+   ```
+
+0 errors, 90 warnings

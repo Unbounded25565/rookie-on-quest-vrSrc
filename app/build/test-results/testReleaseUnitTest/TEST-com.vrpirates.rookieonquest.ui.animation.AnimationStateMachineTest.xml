@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" tests="25" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:28.642Z" hostname="codespaces-952529" time="0.347">
+  <properties/>
+  <testcase name="progressUpdate_onIdleState_fails" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.024"/>
+  <testcase name="installStatus_mapping_coverage" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.004"/>
+  <testcase name="validTransition_installingToIdle" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.001"/>
+  <testcase name="validTransition_pausedToIdle" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="validTransition_pausedToDownloading" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="stateFlow_emission_within16ms" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.092"/>
+  <testcase name="validTransition_extractingToInstalling" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="invalidTransition_idleToPaused" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.001"/>
+  <testcase name="invalidTransition_pausedToDownloading_withoutActiveState" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="stateFlow_emitsOnTransition" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.006"/>
+  <testcase name="progressUpdate_clampedToValidRange" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.005"/>
+  <testcase name="invalidTransition_extractingToDownloading" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="transition_completesWithin16ms" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.094"/>
+  <testcase name="pausedState_withDifferentReasons" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="threadSafety_concurrentProgressUpdates" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.044"/>
+  <testcase name="invalidTransition_installingToExtracting" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="progressUpdate_onExtractingState" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.004"/>
+  <testcase name="threadSafety_concurrentTransitions" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.056"/>
+  <testcase name="validTransition_downloadingToPaused" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="canTransitionTo_returnsCorrectValue" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.001"/>
+  <testcase name="progressUpdate_onDownloadingState" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.002"/>
+  <testcase name="reset_returnsToIdle" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.003"/>
+  <testcase name="validTransition_downloadingToExtracting" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="validTransition_idleToDownloading" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.0"/>
+  <testcase name="progressUpdate_onPausedState_fails" classname="com.vrpirates.rookieonquest.ui.animation.AnimationStateMachineTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

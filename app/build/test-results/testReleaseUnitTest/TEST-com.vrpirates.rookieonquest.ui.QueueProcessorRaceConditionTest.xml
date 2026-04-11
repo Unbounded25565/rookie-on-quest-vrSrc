@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:28.463Z" hostname="codespaces-952529" time="0.099">
+  <properties/>
+  <testcase name="FIXED - processor rechecks queue after timeout if tasks appeared" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.058"/>
+  <testcase name="FIXED - processor exits cleanly when queue is genuinely empty" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.005"/>
+  <testcase name="FIXED - signal is CONFLATED - multiple signals merge into one" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.009"/>
+  <testcase name="FIXED - processor handles multiple rapid task additions" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.004"/>
+  <testcase name="BUGGY - processor exits before task is visible in StateFlow" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.003"/>
+  <testcase name="FIXED - processor handles mixed states on restart" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.004"/>
+  <testcase name="FIXED - processor waits for signal when task added concurrently" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.004"/>
+  <testcase name="FIXED - processor handles app restart with existing queued tasks" classname="com.vrpirates.rookieonquest.ui.QueueProcessorRaceConditionTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

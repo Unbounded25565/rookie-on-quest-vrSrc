@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.ui.StatusMappingTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:18.724Z" hostname="codespaces-952529" time="0.013">
+  <properties/>
+  <testcase name="testDataToTaskStatusMapping" classname="com.vrpirates.rookieonquest.ui.StatusMappingTest" time="0.011"/>
+  <testcase name="testTaskToDataStatusMapping" classname="com.vrpirates.rookieonquest.ui.StatusMappingTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

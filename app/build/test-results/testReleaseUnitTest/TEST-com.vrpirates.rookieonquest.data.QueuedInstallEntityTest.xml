@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" tests="29" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:24.764Z" hostname="codespaces-952529" time="0.07">
+  <properties/>
+  <testcase name="entityEquality_withSameData_isEqual" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.01"/>
+  <testcase name="validation_downloadedBytesExceedsTotalBytes_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.003"/>
+  <testcase name="isValid_withValidEntity_returnsTrue" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.002"/>
+  <testcase name="isDownloadOnly_explicitValue_preserved" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="createHelper_withEnum_createsValidEntity" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="validation_zeroTotalBytes_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.021"/>
+  <testcase name="validation_negativeQueuePosition_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.007"/>
+  <testcase name="validate_instanceMethod_matchesCompanionMethod" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="validation_negativeDownloadedBytes_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.004"/>
+  <testcase name="entityCreation_withValidData_succeeds" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="createValidated_withInvalidData_throwsException" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.008"/>
+  <testcase name="isDownloadOnly_defaultValue_isFalse" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.001"/>
+  <testcase name="validation_invalidStatus_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="statusEnum_convertsCorrectly" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.001"/>
+  <testcase name="validation_invalidTimestamps_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="validation_multipleErrors_returnsAllErrors" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.001"/>
+  <testcase name="validation_invalidProgress_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="statusTransitions_validValues" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="createValidated_withValidData_succeeds" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.001"/>
+  <testcase name="isValid_withInvalidEntity_returnsFalse" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="queuePosition_ordering" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="nullableFields_handledCorrectly" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="validation_validData_returnsEmptyList" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="entityEquality_withDifferentData_isNotEqual" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.005"/>
+  <testcase name="entityCreation_withDownloadProgress_succeeds" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="validation_blankReleaseName_returnsError" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="dataClass_copy_createsNewInstance" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="progressValue_withinValidRange" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <testcase name="createHelper_withIsDownloadOnly_createsValidEntity" classname="com.vrpirates.rookieonquest.data.QueuedInstallEntityTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

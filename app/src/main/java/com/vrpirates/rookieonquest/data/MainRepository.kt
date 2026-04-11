@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import android.os.SystemClock
-import android.util.Base64
 import android.util.Log
 import com.vrpirates.rookieonquest.logic.CatalogParser
 import com.vrpirates.rookieonquest.logic.CatalogUtils
@@ -109,16 +108,10 @@ class MainRepository(
         // Return hardcoded config instead of fetching from API
         val config = PublicConfig(
             baseUri = "https://go.srcdl1.xyz/",
-            password64 = "WjB3MU9WWm1aMUI0YjBoUw=="
+            password = "Z0w1OVZmZ1B4b0hS"
         )
         cachedConfig = config
-        try {
-            val decoded = Base64.decode(config.password64, Base64.DEFAULT)
-            decodedPassword = String(decoded, Charsets.UTF_8)
-        } catch (e: Exception) {
-            Log.w(TAG, "Failed to decode password64, using raw value: ${e.message}")
-            decodedPassword = config.password64
-        }
+        decodedPassword = config.password
         config
     }
 
@@ -178,33 +171,61 @@ class MainRepository(
                                          tempMetaFile.length() > 0 && 
                                          (System.currentTimeMillis() - tempMetaFile.lastModified() < CatalogUtils.CACHE_FRESHNESS_THRESHOLD_MS)
             
-                            if (isFresh) {
-                                Log.i(TAG, "Using recently cached meta file from worker")
-                            } else {
+suspend fun ensureValidMetaFile(): Boolean {
+                                if (isFresh) {
+                                    if (isSevenZArchive(tempMetaFile)) {
+                                        Log.i(TAG, "Using recently cached meta file from worker")
+                                        return true
+                                    }
+                                    Log.w(TAG, "Cached meta file is invalid, deleting and redownloading")
+                                    tempMetaFile.delete()
+                                }
                                 Log.d(TAG, "syncCatalog: calling downloadFile...")
                                 CatalogUtils.downloadFile(metaUrl, tempMetaFile)
                                 Log.d(TAG, "syncCatalog: downloadFile finished")
+                                val valid = isSevenZArchive(tempMetaFile)
+                                if (!valid) {
+                                    Log.w(TAG, "Downloaded meta file is not a valid 7z archive")
+                                }
+                                return valid
                             }
-            
+
+                            if (!ensureValidMetaFile()) {
+                                throw IOException("Failed to obtain a valid meta.7z file from $metaUrl")
+                            }
+
                             // 50% progress: download complete, starting extraction.
                             // Extraction is the most CPU intensive part on Quest hardware.
                             onProgress(0.5f) 
                             Log.d(TAG, "Meta file ready, size: ${tempMetaFile.length()} bytes")
-            
-                            val passwordsToTry = (listOfNotNull(decodedPassword, cachedConfig?.password64) + listOf<String?>(null)).distinct()
+
+                            val passwordsToTry = (listOfNotNull(decodedPassword, cachedConfig?.password) + listOf<String?>(null)).distinct()
                             var gameListContent = ""
                             var success = false
-            
-                            for (pass in passwordsToTry) {
-                                try {
-                                    Log.d(TAG, "Attempting extraction with password: ${if (pass != null) "****" else "none"}")
-                                    extractMetaToCache(tempMetaFile, pass) { content -> gameListContent = content }
-                                    success = true
-                                    Log.i(TAG, "Extraction successful")
-                                    break
-                                } catch (e: Exception) {
-                                    Log.w(TAG, "Extraction failed with password attempt: ${e.message}")
+
+                            fun tryExtract(): Boolean {
+                                for (pass in passwordsToTry) {
+                                    try {
+                                        Log.d(TAG, "Attempting extraction with password: ${if (pass != null) "****" else "none"}")
+                                        extractMetaToCache(tempMetaFile, pass) { content -> gameListContent = content }
+                                        Log.i(TAG, "Extraction successful")
+                                        return true
+                                    } catch (e: Exception) {
+                                        Log.w(TAG, "Extraction failed with password attempt: ${e.message}")
+                                    }
                                 }
+                                return false
+                            }
+
+                            if (!tryExtract()) {
+                                Log.w(TAG, "Initial extraction failed; redownloading meta.7z and retrying")
+                                tempMetaFile.delete()
+                                if (!ensureValidMetaFile()) {
+                                    throw IOException("Failed to obtain a valid meta.7z file after retry from $metaUrl")
+                                }
+                                success = tryExtract()
+                            } else {
+                                success = true
                             }
             
                             if (success && gameListContent.isNotEmpty()) {
@@ -339,6 +360,16 @@ class MainRepository(
             while (sevenZFile.read(buffer).also { bytesRead = it } != -1) {
                 out.write(buffer, 0, bytesRead)
             }
+        }
+    }
+
+    private fun isSevenZArchive(file: File): Boolean {
+        if (!file.exists() || file.length() < 6) return false
+        val signature = byteArrayOf(0x37, 0x7A, 0xBC.toByte(), 0xAF.toByte(), 0x27, 0x1C)
+        return file.inputStream().use { input ->
+            val header = ByteArray(signature.size)
+            if (input.read(header) != header.size) return false
+            header.contentEquals(signature)
         }
     }
 
@@ -1155,7 +1186,7 @@ class MainRepository(
                     // Note: Skip separate "Preparing extraction" call here - merge already ended at 85%
                     // The counting phase will maintain 85% until extraction starts
                     // Try multiple password variants for extraction robustness (Story 4.3 Round 20 Fix)
-                    val passwordsToTry = (listOfNotNull(decodedPassword, cachedConfig?.password64) + listOf<String?>(null)).distinct()
+                    val passwordsToTry = (listOfNotNull(decodedPassword, cachedConfig?.password) + listOf<String?>(null)).distinct()
                     var extractionSuccess = false
                     var lastExtractionError: Exception? = null
 

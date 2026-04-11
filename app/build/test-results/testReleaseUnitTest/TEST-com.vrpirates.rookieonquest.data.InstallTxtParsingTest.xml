@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:24.610Z" hostname="codespaces-952529" time="0.031">
+  <properties/>
+  <testcase name="installTxt_handleRelativePaths" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.017"/>
+  <testcase name="installTxt_parseMultiplePushCommands" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.005"/>
+  <testcase name="obbDetection_naturalSorting" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.002"/>
+  <testcase name="installTxt_parseQuotedPaths" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.0"/>
+  <testcase name="obbDetection_caseInsensitiveExtension" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.001"/>
+  <testcase name="installTxt_ignoreNonPushLines" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.0"/>
+  <testcase name="installTxt_parseAdbPushArgs_escapedQuotes" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.001"/>
+  <testcase name="obbDetection_standardPattern" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.001"/>
+  <testcase name="installTxt_parseAdbPushArgs_edgeCases" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.001"/>
+  <testcase name="installTxt_parseBasicPushCommand" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.0"/>
+  <testcase name="installTxt_isAdbPushCommand_variousCases" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.0"/>
+  <testcase name="installTxt_handleTrailingSlashVariants" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.001"/>
+  <testcase name="obbDetection_naturalSorting_mainBeforePatch" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.0"/>
+  <testcase name="installTxt_parseMixedQuoting" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.0"/>
+  <testcase name="obbDetection_looseObbFiles" classname="com.vrpirates.rookieonquest.data.InstallTxtParsingTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

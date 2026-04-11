@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.WakeLockManagerTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:14.276Z" hostname="codespaces-952529" time="0.029">
+  <properties/>
+  <testcase name="maxWakeLockTimeoutMs_equals_1800000_ms" classname="com.vrpirates.rookieonquest.data.WakeLockManagerTest" time="0.013"/>
+  <testcase name="getHeldDurationMs_returns_0_when_not_held" classname="com.vrpirates.rookieonquest.data.WakeLockManagerTest" time="0.012"/>
+  <testcase name="hasExceededTwoMinutes_returns_false_when_not_held" classname="com.vrpirates.rookieonquest.data.WakeLockManagerTest" time="0.002"/>
+  <testcase name="twoMinuteThreshold_is_120000_ms" classname="com.vrpirates.rookieonquest.data.WakeLockManagerTest" time="0.0"/>
+  <testcase name="extractionProgressThrottleMs_is_1_second" classname="com.vrpirates.rookieonquest.data.WakeLockManagerTest" time="0.001"/>
+  <testcase name="maxWakeLockTimeoutMs_is_30_minutes" classname="com.vrpirates.rookieonquest.data.WakeLockManagerTest" time="0.0"/>
+  <testcase name="isHeld_returns_false_when_never_acquired" classname="com.vrpirates.rookieonquest.data.WakeLockManagerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

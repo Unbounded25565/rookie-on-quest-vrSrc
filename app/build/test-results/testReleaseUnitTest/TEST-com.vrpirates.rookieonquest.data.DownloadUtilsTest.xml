@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.data.DownloadUtilsTest" tests="27" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:24.431Z" hostname="codespaces-952529" time="0.107">
+  <properties/>
+  <testcase name="shouldSkipEntry_returns_true_for_notes_and_screenshots" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.045"/>
+  <testcase name="calculateRequiredStorage_nonArchive_uses_1_1x_multiplier" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="shouldSkipEntry_returns_true_for_parent_directory" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="maxConcurrentHeadRequests_is_5" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.001"/>
+  <testcase name="isRangeNotSatisfiable_returns_false_for_200" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isRangeNotSatisfiable_returns_false_for_206" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isRangeNotSatisfiable_returns_false_for_404" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.001"/>
+  <testcase name="hrefRegex_matches_multiple_hrefs" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.037"/>
+  <testcase name="calculateRequiredStorage_7z_keepApk_uses_3_5x_multiplier" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isResumeResponse_returns_false_for_200" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isResumeResponse_returns_false_for_404" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.002"/>
+  <testcase name="isResumeResponse_returns_false_for_416" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isResumeResponse_returns_false_for_500" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isRangeNotSatisfiable_returns_true_for_416" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="hrefRegex_handles_case_insensitive" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.003"/>
+  <testcase name="isDownloadableFile_returns_true_for_apk" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isDownloadableFile_returns_true_for_obb" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="shouldSkipEntry_returns_true_for_hidden_files" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.001"/>
+  <testcase name="hrefRegex_handles_spaces_around_equals" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.003"/>
+  <testcase name="hrefRegex_matches_standard_href" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="shouldSkipEntry_returns_false_for_valid_entries" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isDownloadableFile_returns_true_for_7z_archives" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.001"/>
+  <testcase name="calculateRequiredStorage_7z_noKeep_uses_2_5x_multiplier" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isDownloadableFile_returns_false_for_other_files" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="isResumeResponse_returns_true_for_206" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <testcase name="shouldSkipEntry_returns_true_for_underscored_files" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.001"/>
+  <testcase name="downloadBufferSize_is_64KB" classname="com.vrpirates.rookieonquest.data.DownloadUtilsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

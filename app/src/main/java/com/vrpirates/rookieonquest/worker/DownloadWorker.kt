@@ -8,7 +8,6 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
-import android.util.Base64
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -524,15 +523,10 @@ class DownloadWorker(
         // Return hardcoded config instead of fetching from API
         val config = PublicConfig(
             baseUri = "https://go.srcdl1.xyz/",
-            password64 = "WjB3MU9WWm1aMUI0YjBoUw=="
+            password = "Z0w1OVZmZ1B4b0hS"
         )
         cachedConfig = config
-        try {
-            val decoded = Base64.decode(config.password64, Base64.DEFAULT)
-            decodedPassword = String(decoded, Charsets.UTF_8)
-        } catch (e: Exception) {
-            decodedPassword = config.password64
-        }
+        decodedPassword = config.password
         return config
     }
 

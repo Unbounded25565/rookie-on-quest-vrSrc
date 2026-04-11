@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.13.2" type="partial_results">
+    <map id="NotificationPermission">
+        <entry
+            name="source"
+            boolean="true"/>
+    </map>
+    <map id="UnsafeImplicitIntentLaunch">
+            <map id="actionsSent">
+                    <map id="android.intent.action.DELETE (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="156"
+                            column="38"
+                            startOffset="7161"
+                            endLine="156"
+                            endColumn="66"
+                            endOffset="7189"/>
+                    </map>
+                    <map id="android.intent.action.VIEW (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="168"
+                            column="38"
+                            startOffset="7822"
+                            endLine="168"
+                            endColumn="64"
+                            endOffset="7848"/>
+                    </map>
+                    <map id="android.settings.APPLICATION_DETAILS_SETTINGS (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="224"
+                            column="46"
+                            startOffset="11369"
+                            endLine="224"
+                            endColumn="98"
+                            endOffset="11421"/>
+                        <location id="1"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="679"
+                            column="50"
+                            startOffset="38248"
+                            endLine="679"
+                            endColumn="102"
+                            endOffset="38300"/>
+                    </map>
+                    <map id="android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="706"
+                            column="46"
+                            startOffset="39928"
+                            endLine="706"
+                            endColumn="106"
+                            endOffset="39988"/>
+                    </map>
+                    <map id="android.settings.MANAGE_ALL_FILES_ACCESS_PERMISSION (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="694"
+                            column="50"
+                            startOffset="39207"
+                            endLine="694"
+                            endColumn="108"
+                            endOffset="39265"/>
+                    </map>
+                    <map id="android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="240"
+                            column="41"
+                            startOffset="12438"
+                            endLine="240"
+                            endColumn="103"
+                            endOffset="12500"/>
+                        <location id="1"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="689"
+                            column="50"
+                            startOffset="38835"
+                            endLine="689"
+                            endColumn="112"
+                            endOffset="38897"/>
+                    </map>
+                    <map id="android.settings.MANAGE_UNKNOWN_APP_SOURCES (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="233"
+                            column="41"
+                            startOffset="11950"
+                            endLine="233"
+                            endColumn="91"
+                            endOffset="12000"/>
+                        <location id="1"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="673"
+                            column="50"
+                            startOffset="37809"
+                            endLine="673"
+                            endColumn="100"
+                            endOffset="37859"/>
+                    </map>
+                    <map id="android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS (used to start an activity)">
+                        <location id="0"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="247"
+                            column="41"
+                            startOffset="12943"
+                            endLine="247"
+                            endColumn="101"
+                            endOffset="13003"/>
+                        <location id="1"
+                            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+                            line="701"
+                            column="46"
+                            startOffset="39578"
+                            endLine="701"
+                            endColumn="106"
+                            endOffset="39638"/>
+                    </map>
+            </map>
+    </map>
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.vrpirates.rookieonquest.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+    <map id="UnusedResources">
+        <location id="R.drawable.ic_launcher_foreground"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/drawable/ic_launcher_foreground.xml"
+            line="1"
+            column="1"
+            startOffset="0"
+            endLine="9"
+            endColumn="10"
+            endOffset="1199"/>
+        <location id="R.string.status_waiting_permissions"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="15"
+            column="13"
+            startOffset="799"
+            endLine="15"
+            endColumn="46"
+            endOffset="832"/>
+        <entry
+            name="model"
+            string="color[ic_launcher_background(U)],drawable[app_icon(U),ic_launcher_foreground(D)],mipmap[ic_launcher(U),ic_launcher_round(U)],string[app_name(U),status_queued(U),status_downloading(U),status_extracting(U),status_installing(U),status_pending_install(U),status_paused(U),status_completed(U),status_failed(U),status_local_verifying(U),status_shelved(U),status_waiting_permissions(D),perm_install_title(U),perm_storage_title(U),perm_battery_title(U),perm_install_desc(U),perm_storage_desc(U),perm_battery_desc(U),perm_install_why(U),perm_storage_why(U),perm_battery_why(U),perm_revoked_title(U),perm_revoked_msg(U),perm_revoked_multiple_msg(U),perm_name_install(U),perm_name_storage(U),perm_name_battery(U),btn_cancel(U),btn_grant(U),btn_open_settings(U),btn_later(U),perm_overlay_title(U),perm_overlay_subtitle(U),perm_overlay_grant_button(U),perm_install_unknown_apps_title(U),perm_install_unknown_apps_desc(U),perm_manage_storage_title(U),perm_manage_storage_desc(U),perm_battery_optimization_title(U),perm_battery_optimization_desc(U),perm_denial_message(U),status_blocked_permissions(U),msg_permissions_granted(U),msg_critical_permissions_granted(U),game_btn_resume(U),game_btn_in_queue(U),game_btn_paused(U),game_btn_update(U),game_btn_installed(U),game_btn_install(U),game_btn_download(U),game_btn_uninstall(U),game_btn_delete_download(U),game_btn_complete_install(U),filter_local_installs(U),update_available_title(U),update_available_desc(U),btn_update_now(U),dialog_delete_download_title(U),dialog_delete_download_msg(U),btn_delete(U),catalog_update_title(U),catalog_update_message(U),catalog_update_message_simple(U),catalog_btn_dismiss(U),catalog_btn_sync_now(U),catalog_update_calculating(U),catalog_sync_failed(U),catalog_syncing_title(U),catalog_syncing_progress(U),catalog_syncing_with_count(U),catalog_syncing_with_count_simple(U),catalog_syncing(U)],style[Theme_RookieOnQuest(U)],xml[file_paths(U)];3^0^1,4^0^1;;;"/>
+    </map>
+
+</incidents>

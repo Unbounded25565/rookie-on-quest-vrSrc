@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.13.2" type="conditional_incidents">
+
+    <incident
+        id="ScopedStorage"
+        severity="warning"
+        message="">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*manifest*0}"
+            line="6"
+            column="36"
+            startOffset="263"
+            endLine="6"
+            endColumn="76"
+            endOffset="303"/>
+        <map>
+            <entry
+                name="maxSdkVersion"
+                int="2147483647"/>
+            <entry
+                name="read"
+                boolean="true"/>
+        </map>
+    </incident>
+
+    <incident
+        id="ScopedStorage"
+        severity="warning"
+        message="">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*manifest*0}"
+            line="7"
+            column="36"
+            startOffset="343"
+            endLine="7"
+            endColumn="77"
+            endOffset="384"/>
+        <map>
+            <entry
+                name="maxSdkVersion"
+                int="2147483647"/>
+            <entry
+                name="read"
+                boolean="false"/>
+        </map>
+    </incident>
+
+    <incident
+        id="NotificationPermission"
+        severity="error"
+        message="When targeting Android 13 or higher, posting a permission requires holding the `POST_NOTIFICATIONS` permission">
+        <fix-data missing="android.permission.POST_NOTIFICATIONS"/>
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/worker/DownloadWorker.kt"
+            line="727"
+            column="13"
+            startOffset="32995"
+            endLine="727"
+            endColumn="70"
+            endOffset="33052"/>
+    </incident>
+
+    <incident
+        id="BatteryLife"
+        severity="warning"
+        message="Use of `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` violates the Play Store Content Policy regarding acceptable use cases, as described in https://developer.android.com/training/monitoring-device-state/doze-standby.html">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+            line="247"
+            column="57"
+            startOffset="12959"
+            endLine="247"
+            endColumn="100"
+            endOffset="13002"/>
+        <map>
+            <condition targetGE="23"/>
+        </map>
+    </incident>
+
+    <incident
+        id="BatteryLife"
+        severity="warning"
+        message="Use of `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` violates the Play Store Content Policy regarding acceptable use cases, as described in https://developer.android.com/training/monitoring-device-state/doze-standby.html">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/MainActivity.kt"
+            line="701"
+            column="62"
+            startOffset="39594"
+            endLine="701"
+            endColumn="105"
+            endOffset="39637"/>
+        <map>
+            <condition targetGE="23"/>
+        </map>
+    </incident>
+
+    <incident
+        id="QueryPermissionsNeeded"
+        severity="warning"
+        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details">
+        <location
+            file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/vrpirates/rookieonquest/data/MainRepository.kt"
+            line="393"
+            column="31"
+            startOffset="19654"
+            endLine="393"
+            endColumn="51"
+            endOffset="19674"/>
+        <map>
+            <entry
+                name="queryAll"
+                boolean="true"/>
+        </map>
+    </incident>
+
+</incidents>

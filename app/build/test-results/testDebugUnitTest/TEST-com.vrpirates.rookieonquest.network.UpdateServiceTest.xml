@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.vrpirates.rookieonquest.network.UpdateServiceTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-04-11T03:35:14.954Z" hostname="codespaces-952529" time="3.621">
+  <properties/>
+  <testcase name="checkUpdate_handlesNetworkFailure" classname="com.vrpirates.rookieonquest.network.UpdateServiceTest" time="1.466"/>
+  <testcase name="checkUpdate_handles403Forbidden" classname="com.vrpirates.rookieonquest.network.UpdateServiceTest" time="0.057"/>
+  <testcase name="checkUpdate_handlesInvalidJson" classname="com.vrpirates.rookieonquest.network.UpdateServiceTest" time="0.026"/>
+  <testcase name="checkUpdate_handlesMissingFields" classname="com.vrpirates.rookieonquest.network.UpdateServiceTest" time="0.022"/>
+  <testcase name="checkUpdate_sendsCorrectHeaders_andParsesResponse" classname="com.vrpirates.rookieonquest.network.UpdateServiceTest" time="0.027"/>
+  <testcase name="checkUpdate_handlesNetworkTimeout" classname="com.vrpirates.rookieonquest.network.UpdateServiceTest" time="2.022"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
